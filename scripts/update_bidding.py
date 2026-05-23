@@ -7,7 +7,8 @@ GEO招投标情报更新工具
   python update_bidding.py --batch "file.csv"  # 批量导入CSV
   python update_bidding.py --sync-docs         # 同步数据到docs/目录
 """
-import json, os, csv, sys
+import json, os, csv, sys, io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
