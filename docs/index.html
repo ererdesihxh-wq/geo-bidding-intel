@@ -6,51 +6,143 @@
 <title>GEO招投标情报站</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #1a1a2e; line-height: 1.6; }
-  .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; padding: 40px 20px; text-align: center; }
-  .header h1 { font-size: 28px; margin-bottom: 8px; }
-  .header p { opacity: .8; font-size: 14px; }
-  .header .badge { display: inline-block; background: #e94560; color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 12px; margin-top: 12px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f7fa; color: #1a1a2e; line-height: 1.6; }
+  .header { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: #fff; padding: 40px 20px; text-align: center; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%); }
+  .header h1 { font-size: 28px; margin-bottom: 8px; position: relative; letter-spacing: 2px; }
+  .header p { opacity: .8; font-size: 14px; position: relative; }
+  .header .badge { display: inline-block; background: #e94560; color: #fff; padding: 4px 14px; border-radius: 12px; font-size: 12px; margin-top: 12px; position: relative; }
   .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
-  .stat-card { background: #fff; border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-  .stat-card .num { font-size: 28px; font-weight: 700; color: #1a1a2e; }
-  .stat-card .label { font-size: 12px; color: #666; margin-top: 4px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: #fff; border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.06); border: 1px solid #f0f0f0; transition: transform .15s; }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-card .num { font-size: 28px; font-weight: 700; }
+  .stat-card .label { font-size: 12px; color: #888; margin-top: 4px; }
   .stat-card.green .num { color: #27ae60; }
   .stat-card.orange .num { color: #e67e22; }
   .stat-card.blue .num { color: #2980b9; }
   .stat-card.purple .num { color: #8e44ad; }
-  .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-  .filters select, .filters input { padding: 8px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; }
-  .filters select { min-width: 120px; }
-  .filters input { flex: 1; min-width: 200px; }
-  .update-info { font-size: 12px; color: #999; margin-bottom: 16px; }
+  .stat-card.red .num { color: #e74c3c; }
+  .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .filters select, .filters input { padding: 8px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #fff; outline: none; transition: border .2s; }
+  .filters select:focus, .filters input:focus { border-color: #302b63; }
+  .filters select { min-width: 120px; cursor: pointer; }
+  .filters input { flex: 1; min-width: 180px; }
+  .filters .result-count { font-size: 13px; color: #999; white-space: nowrap; }
+  .update-info { font-size: 12px; color: #aaa; margin-bottom: 16px; }
 
-  .project { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); transition: box-shadow .2s; }
-  .project:hover { box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+  .project { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); border: 1px solid #f0f0f0; transition: box-shadow .2s, border-color .2s; }
+  .project:hover { box-shadow: 0 3px 12px rgba(0,0,0,.1); border-color: #e0e0e0; }
   .project .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-  .project .company { font-size: 16px; font-weight: 700; color: #1a1a2e; }
-  .project .industry { font-size: 12px; color: #666; }
+  .project .company { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+  .project .industry-tag { display: inline-block; font-size: 11px; color: #888; background: #f5f5f5; padding: 2px 8px; border-radius: 4px; margin-top: 4px; }
   .project .title { font-size: 14px; color: #333; margin: 8px 0; line-height: 1.5; }
-  .project .meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: #666; }
-  .project .meta span { display: flex; align-items: center; gap: 4px; }
-  .project .summary { font-size: 13px; color: #555; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; }
-  .project .link { margin-top: 10px; }
-  .project .link a { font-size: 12px; color: #2980b9; text-decoration: none; }
+  .project .meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: #888; }
+  .project .meta span { display: inline-flex; align-items: center; gap: 3px; }
+  .project .summary { font-size: 13px; color: #555; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; line-height: 1.6; }
+  .project .winner-line { font-size: 13px; color: #c0392b; margin-top: 8px; }
+  .project .link { margin-top: 10px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .project .link a { font-size: 12px; color: #2980b9; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
   .project .link a:hover { text-decoration: underline; }
+  .project .link .source-domain { font-size: 11px; color: #aaa; }
 
-  .tag { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 12px; font-weight: 500; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 500; margin-left: 6px; vertical-align: middle; }
   .tag-bidding { background: #e8f5e9; color: #27ae60; }
   .tag-awarded { background: #fff3e0; color: #e67e22; }
   .tag-completed { background: #e3f2fd; color: #2980b9; }
   .tag-info { background: #f3e5f5; color: #8e44ad; }
 
-  .footer { text-align: center; padding: 30px; color: #999; font-size: 12px; }
+  .footer { text-align: center; padding: 30px 20px; color: #bbb; font-size: 12px; }
+  .footer a { color: #2980b9; text-decoration: none; }
 
+  .empty-state { text-align: center; padding: 60px 20px; color: #bbb; }
+  .empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
+
+  /* ===== Tab Navigation ===== */
+  .tabs { display: flex; background: #fff; border-bottom: 2px solid #e0e0e0; position: sticky; top: 0; z-index: 100; }
+  .tab-btn { flex: 1; padding: 14px 16px; border: none; background: none; font-size: 14px; font-weight: 600; color: #999; cursor: pointer; transition: all .2s; position: relative; font-family: inherit; }
+  .tab-btn:hover { color: #555; background: #fafafa; }
+  .tab-btn.active { color: #302b63; }
+  .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 10%; right: 10%; height: 3px; background: #302b63; border-radius: 3px 3px 0 0; }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* ===== Chart Styles ===== */
+  .trend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .trend-grid .full-width { grid-column: 1 / -1; }
+  .chart-card { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #f0f0f0; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .chart-card h3 { font-size: 14px; color: #333; margin-bottom: 16px; }
+  .chart-card .chart-subtitle { font-size: 12px; color: #aaa; margin-top: -12px; margin-bottom: 16px; }
+  .chart-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .chart-bar-label { font-size: 12px; color: #666; min-width: 80px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chart-bar-track { flex: 1; height: 22px; background: #f0f0f0; border-radius: 4px; overflow: hidden; position: relative; }
+  .chart-bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; min-width: 2px; }
+  .chart-bar-value { font-size: 11px; color: #888; min-width: 40px; white-space: nowrap; }
+  .chart-bar-row .rank { font-size: 11px; color: #999; min-width: 20px; text-align: center; font-weight: 700; }
+  .chart-column-container { display: flex; align-items: flex-end; gap: 8px; height: 180px; padding: 0 8px; }
+  .chart-column { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+  .chart-column .col-fill { width: 100%; max-width: 40px; border-radius: 4px 4px 0 0; transition: height .6s ease; min-height: 2px; }
+  .chart-column .col-label { font-size: 10px; color: #888; margin-top: 4px; white-space: nowrap; transform: rotate(-30deg); transform-origin: left top; }
+  .chart-doughnut { width: 160px; height: 160px; border-radius: 50%; margin: 0 auto 12px; position: relative; }
+  .chart-doughnut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+  .chart-doughnut-center .num { font-size: 24px; font-weight: 700; color: #333; display: block; }
+  .chart-doughnut-center .label { font-size: 11px; color: #999; }
+  .chart-legend { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
+  .chart-legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #666; }
+  .chart-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ===== Analysis Form ===== */
+  .analysis-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .analysis-card { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #f0f0f0; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .analysis-card h3 { font-size: 15px; margin-bottom: 12px; color: #333; }
+  .analysis-card textarea { width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 13px; font-family: inherit; resize: vertical; outline: none; line-height: 1.6; }
+  .analysis-card textarea:focus { border-color: #302b63; }
+  .analysis-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .analysis-actions button { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s; font-family: inherit; }
+  .btn-primary { background: #302b63; color: #fff; }
+  .btn-primary:hover { background: #1a1640; }
+  .btn-secondary { background: #f0f0f0; color: #666; }
+  .btn-secondary:hover { background: #e0e0e0; }
+  .analysis-result { font-size: 13px; line-height: 1.8; }
+  .analysis-result .field { display: flex; padding: 6px 0; border-bottom: 1px solid #f5f5f5; }
+  .analysis-result .field-label { min-width: 100px; color: #999; font-weight: 500; }
+  .analysis-result .field-value { flex: 1; color: #333; }
+  .analysis-result .field-value.editable { cursor: text; outline: none; padding: 2px 6px; border-radius: 4px; }
+  .analysis-result .field-value.editable:focus { background: #f8f8ff; border: 1px solid #302b63; }
+  .analysis-empty { text-align: center; padding: 40px; color: #ccc; }
+  .analysis-history { margin-top: 16px; }
+  .analysis-history-item { padding: 10px 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .analysis-history-item .info { font-size: 13px; }
+  .analysis-history-item .info .name { font-weight: 600; }
+  .analysis-history-item .info .detail { color: #888; font-size: 12px; }
+  .analysis-history-item .del-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 18px; padding: 4px 8px; }
+
+  /* ===== Badges ===== */
+  .badge-geo-high { background: #e8f5e9; color: #27ae60; }
+  .badge-geo-mid { background: #fff8e1; color: #f39c12; }
+  .badge-geo-low { background: #f5f5f5; color: #999; }
+  .badge-p0 { background: #ffebee; color: #e74c3c; font-weight: 700; }
+  .badge-p1 { background: #fff3e0; color: #e67e22; }
+  .badge-p2 { background: #f5f5f5; color: #999; }
+  .signal-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin: 2px; background: #e3f2fd; color: #2980b9; }
+  .project-badges { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+  /* ===== Sort Select ===== */
+  .sort-select { min-width: 140px !important; }
+
+  @media (max-width: 768px) {
+    .trend-grid { grid-template-columns: 1fr; }
+    .analysis-layout { grid-template-columns: 1fr; }
+  }
   @media (max-width: 600px) {
     .header h1 { font-size: 22px; }
-    .stats { grid-template-columns: repeat(2, 1fr); }
-    .project .top { flex-direction: column; }
+    .header p { font-size: 13px; }
+    .stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat-card { padding: 12px; }
+    .stat-card .num { font-size: 22px; }
+    .project { padding: 14px; }
+    .filters select { min-width: 100px; }
+    .tab-btn { font-size: 12px; padding: 10px 8px; }
   }
 </style>
 </head>
@@ -58,135 +150,685 @@
 
 <div class="header">
   <h1>GEO 招投标情报站</h1>
-  <p>GEO（生成式引擎优化）领域招标·投标·中标情报实时追踪</p>
+  <p>GEO（生成式引擎优化）领域招标 · 投标 · 中标情报实时追踪</p>
   <span class="badge" id="projectCount">加载中...</span>
 </div>
 
+<nav class="tabs">
+  <button class="tab-btn active" onclick="switchTab('browse')">📋 项目浏览</button>
+  <button class="tab-btn" onclick="switchTab('trends')">📊 趋势分析</button>
+  <button class="tab-btn" onclick="switchTab('analysis')">🔍 情报分析</button>
+</nav>
+
 <div class="container">
+
+<div id="tab-browse" class="tab-pane active">
   <div class="stats" id="stats"></div>
 
   <div class="filters">
     <select id="statusFilter" onchange="filterProjects()">
       <option value="all">全部状态</option>
-      <option value="招标中">招标中</option>
-      <option value="已中标">已中标</option>
-      <option value="已成交">已成交</option>
-      <option value="情报收集">情报收集</option>
     </select>
     <select id="industryFilter" onchange="filterProjects()">
       <option value="all">全部行业</option>
     </select>
-    <input type="text" id="searchInput" placeholder="搜索企业名称或关键词..." oninput="filterProjects()">
+    <input type="text" id="searchInput" placeholder="搜索企业、项目名称或关键词..." oninput="filterProjects()">
+    <select id="sortSelect" class="sort-select" onchange="filterProjects()">
+      <option value="default">默认排序</option>
+      <option value="budget-desc">预算(高→低)</option>
+      <option value="budget-asc">预算(低→高)</option>
+      <option value="geo-desc">GEO相关度(高→低)</option>
+      <option value="date-desc">日期(新→旧)</option>
+      <option value="date-asc">日期(旧→新)</option>
+    </select>
+    <span class="result-count" id="resultCount"></span>
   </div>
 
   <div class="update-info" id="updateInfo"></div>
   <div id="projectList"></div>
 </div>
 
+<div id="tab-trends" class="tab-pane">
+  <div class="trend-grid">
+    <div class="chart-card full-width">
+      <h3>📈 月度项目趋势</h3>
+      <div class="chart-subtitle">按发布月份统计的 GEO 招标项目数</div>
+      <div id="monthlyTrendChart"><div class="empty-state"><p>加载中...</p></div></div>
+    </div>
+    <div class="chart-card">
+      <h3>🏭 行业分布</h3>
+      <div id="industryChart"><div class="empty-state"><p>加载中...</p></div></div>
+    </div>
+    <div class="chart-card">
+      <h3>💰 预算分析</h3>
+      <div id="budgetChart"><div class="empty-state"><p>加载中...</p></div></div>
+    </div>
+    <div class="chart-card">
+      <h3>🏆 供应商排名</h3>
+      <div id="providerChart"><div class="empty-state"><p>加载中...</p></div></div>
+    </div>
+  </div>
+</div>
+
+<div id="tab-analysis" class="tab-pane">
+  <div class="analysis-layout">
+    <div class="analysis-card">
+      <h3>✏️ 输入招标信息</h3>
+      <textarea id="analysisInput" rows="10" placeholder="粘贴招标公告文本或URL...&#10;&#10;示例：&#10;项目名称：东风Honda 2026年GEO项目&#10;采购人：东风本田汽车有限公司&#10;预算金额：1207万元&#10;投标截止时间：2025年3月16日&#10;项目需求：在DeepSeek、Kimi等AI平台进行车型推荐优化"></textarea>
+      <div class="analysis-actions">
+        <button class="btn-primary" onclick="runAnalysis()">开始分析</button>
+        <button class="btn-secondary" onclick="document.getElementById('analysisInput').value='';document.getElementById('analysisResult').innerHTML='<div class=\\'analysis-empty\\'><p>输入招标信息后点击开始分析</p></div>'">清空</button>
+      </div>
+    </div>
+    <div class="analysis-card">
+      <h3>📄 分析结果</h3>
+      <div id="analysisResult"><div class="analysis-empty"><p>输入招标信息后点击"开始分析"</p></div></div>
+    </div>
+  </div>
+  <div class="analysis-card">
+    <h3>📚 历史分析记录</h3>
+    <div id="analysisHistory"><div class="analysis-empty"><p>暂无保存的分析记录</p></div></div>
+  </div>
+</div>
+
+</div>
+
 <div class="footer">
-  <p>数据来源：中国招标投标公共服务平台、各政府采购网、企业招标平台 | 人工整理，仅供参考</p>
+  <p>数据来源：各招标投标公共服务平台、政府采购网、企业官网招标页面 | 人工整理，仅供参考</p>
   <p>如需补充或修正数据，请联系维护者</p>
 </div>
 
 <script>
-let data = null;
+// ===== 内置数据（确保本地打开也能用） =====
+var INLINE_DATA = {"meta": {"name": "GEO招投标情报站", "description": "GEO（生成式引擎优化）领域真实招标、投标、中标情报追踪。每个项目均来自官方招标平台或企业官网公告。", "last_updated": "2026-05-23", "total_projects": 33, "data_sources": ["华润集团守正电子招标平台", "中国政府采购网", "各企业官网招标页面", "招标投标公共服务平台", "广州公共资源交易中心", "中粮E采供应链采购平台", "东风汽车采购招投标平台", "京东招标平台", "美团采购平台"], "note": "仅收录明确标注'GEO优化''生成式引擎优化''AI搜索优化'或实质为GEO的项目。排除地理信息(GIS)类GEO项目。"}, "projects": [{"id": "GEO-2025-001", "company": "九号公司", "industry": "短交通/出行", "title": "2025年短交通产品GEO生成式引擎优化服务供应商招标", "status": "已截止", "budget": "保证金1万元", "bid_deadline": "2025-10-15", "publish_date": "2025-09-23", "summary": "九号公司（Segway-Ninebot）就2025-2026年短交通产品线GEO生成式引擎优化服务进行招标。要求供应商成立≥3年、注册资金≥100万、社保≥10人、年度营业额≥300万，具有3个以上同行业头部客户成功案例。服务期至2026年4月。", "winner": "", "source_url": "https://www.ygbid.com/tender/20250923203620200003.html", "_computed": {"budget_wan": 1.0, "geo_relevance": {"score": 0, "tier": "低"}, "priority": "P2", "signals": []}}, {"id": "GEO-2025-002", "company": "上海大学", "industry": "教育", "title": "城市体征及活力监测GEO AI数字计算系统采购意向", "status": "采购意向", "budget": "47.7万元", "bid_deadline": "", "publish_date": "2025-07-25", "summary": "上海大学城市体征及活力监测GEO AI数字计算系统采购意向，预算47.7万元。属于高校在GEO+AI领域的技术基础设施采购。", "winner": "", "source_url": "https://bidding.shu.edu.cn/sy/xtgg_detail.jsp?wid=202507250027983857&gglx2bh=CGYX", "_computed": {"budget_wan": 47.7, "geo_relevance": {"score": 5, "tier": "低"}, "priority": "P2", "signals": ["🎓 公共采购"]}}, {"id": "GEO-2025-003", "company": "华润饮料（怡宝）", "industry": "快消/饮料", "title": "华润饮料2025-2026年企业品牌优化第三方服务项目（含GEO/SEO）", "status": "已截止", "budget": "未公开", "bid_deadline": "2025-05-12", "publish_date": "2025-05-07", "summary": "华润怡宝（华润饮料）2025-2026年企业品牌优化第三方服务项目，包含搜索引擎内容引擎优化（GEO/SEO）、百科优化等。要求百度百科词条搭建更新、新闻稿件≥80篇、问答平台内容≥40组，覆盖品牌词及行业词优化。", "winner": "", "source_url": "https://www.ygbid.com/tender/20250507160004900002.html", "_computed": {"budget_wan": null, "geo_relevance": {"score": 5, "tier": "低"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-001", "company": "东阿阿胶（华润集团）", "industry": "医药/健康", "title": "2026年东阿阿胶GEO优化项目询比采购", "status": "已中标", "budget": "未公开", "bid_deadline": "2026-03-19", "publish_date": "2026-03-11", "summary": "华润集团旗下东阿阿胶2026年GEO优化项目。成交供应商为秒针信息技术有限公司和福建新升代数字技术有限公司。属于华润系企业第二批GEO集中采购，覆盖品牌在主流AI平台的可见度优化。", "winner": "秒针信息技术有限公司、福建新升代数字技术有限公司", "source_url": "https://szecp.crc.com.cn/zbxx/006002/006002003/20260403/YYCJGG202603310003.html", "_computed": {"budget_wan": null, "geo_relevance": {"score": 10, "tier": "低"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-002", "company": "昆药集团（华润旗下）", "industry": "医药/健康", "title": "GEO AI搜索引擎优化采购项目", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-02-06", "publish_date": "2026-02-02", "summary": "华润旗下昆药集团GEO AI搜索引擎优化服务采购，为华润系企业首批GEO优化项目之一。采购编号SJCGXY202602020002。", "winner": "", "source_url": "https://szecp.crc.com.cn/zbxx/006002/006002001/20260202/SJXYGG202602020002.html", "_computed": {"budget_wan": null, "geo_relevance": {"score": 12, "tier": "低"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-003", "company": "扬子江药业集团", "industry": "医药/健康", "title": "2026年品牌宣传部GEO项目", "status": "招标中", "budget": "未公开", "bid_deadline": "2026-04-27", "publish_date": "2026-04-20", "summary": "扬子江药业集团品牌宣传部2026年GEO项目招标，服务地点北京朝阳区，服务周期半年。进行相关词条的GEO优化，提升品牌在AI搜索引擎中的可见度。来源：扬子江药业集团官网招标页面。", "winner": "", "source_url": "https://www.yangzijiang.com/Bidding/4396.html", "_computed": {"budget_wan": null, "geo_relevance": {"score": 17, "tier": "低"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-004", "company": "天翼云", "industry": "通信/云计算", "title": "2026年官网GEO优化服务采购项目", "status": "已中标", "budget": "106.5万元", "bid_deadline": "2026-03-20", "publish_date": "2026-03-10", "summary": "天翼云2026年官网GEO优化服务采购，第一中标候选人为北京鲲鹏伟业广告有限公司，投标报价1,065,000元（不含增值税）。招标代理为中捷通信有限公司。", "winner": "北京鲲鹏伟业广告有限公司", "source_url": "https://mp.weixin.qq.com/s/__biz=MzYyMjEwMTExMw==&mid=2247484886&idx=1&sn=d5c59ffaf57cd31acd39c8dd93dc9d39", "_computed": {"budget_wan": 106.5, "geo_relevance": {"score": 0, "tier": "低"}, "priority": "P1", "signals": ["💰 高预算(≥100万)"]}}, {"id": "GEO-2026-005", "company": "新明珠集团（冠珠瓷砖）", "industry": "建材/家居", "title": "冠珠瓷砖2026年GEO优化项目", "status": "招标中", "budget": "30万元", "bid_deadline": "2026-05-24", "publish_date": "2026-05-10", "summary": "新明珠集团旗下冠珠瓷砖年度GEO优化项目，预算30万元（含税），服务周期一年。需求包括品牌知识库构建、技术内容优化、AI舆情监控等，要求覆盖主流AI平台。", "winner": "", "source_url": "https://gs.qianlima.com/zbcontent-597667495.html", "_computed": {"budget_wan": 30.0, "geo_relevance": {"score": 10, "tier": "低"}, "priority": "P1", "signals": []}}, {"id": "GEO-2026-006", "company": "东鹏控股", "industry": "建材/家居", "title": "innoci外贸独立站建设及GEO优化项目", "status": "已截止", "budget": "保证金3万元", "bid_deadline": "2026-04-23", "publish_date": "2026-04-09", "summary": "东鹏控股innoci外贸独立站建设及GEO优化项目投标邀请，招标编号2026DPCG-39。含外贸独立站建设与GEO优化双重需求。", "winner": "", "source_url": "http://www.ygbid.com/tender/20260409092926900001.html", "_computed": {"budget_wan": 3.0, "geo_relevance": {"score": 0, "tier": "低"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-007", "company": "宁波市北仑区旅游发展服务中心", "industry": "政府/旅游", "title": "梅山湾旅游度假区2026年度线上平台全矩阵运维采购", "status": "已开标", "budget": "50万元", "bid_deadline": "2026-04-24", "publish_date": "2026-04-03", "summary": "宁波北仑区政府采购项目，预算50万元。包含内容采编、AI客服、网站运维及GEO（生成式搜索引擎）优化。服务期2026年5月至2027年5月。政采云公开招标。标志着GEO正式进入政府采购体系。", "winner": "", "source_url": "https://zfcg.czj.ningbo.gov.cn/project/zcyNotice_view.aspx?Id=202604031716152039995385371561984", "_computed": {"budget_wan": 50.0, "geo_relevance": {"score": 0, "tier": "低"}, "priority": "P1", "signals": ["🏛 政府采购", "🎓 公共采购"]}}, {"id": "GEO-2026-008", "company": "中航电测仪器（西安）有限公司", "industry": "航空航天/电子", "title": "GEO生成式引擎优化询价采购", "status": "招标中", "budget": "未公开", "bid_deadline": "2026-05-31", "publish_date": "2026-05-13", "summary": "中航电测仪器（西安）有限公司就GEO生成式引擎优化服务进行询价采购，数量1套。中航工业体系内企业开始布局GEO优化。", "winner": "", "source_url": "http://www.yfbzb.com/inviteBid/detail/20260513_596834322.html", "_computed": {"budget_wan": null, "geo_relevance": {"score": 0, "tier": "低"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-009", "company": "和君职业学院", "industry": "教育", "title": "生成式AI搜索引擎GEO优化服务项目", "status": "已成交", "budget": "8万元", "bid_deadline": "2026-05-20", "publish_date": "2026-05-15", "summary": "和君职业学院招生办GEO优化服务项目，单一来源采购，成交金额8万元。要求覆盖DeepSeek、豆包、文心一言、通义千问等4个平台共60个优化任务，品牌正向率≥80%。成交供应商为芜湖小象园教育科技有限公司。", "winner": "芜湖小象园教育科技有限公司", "source_url": "https://www.hejuncollege.com/tzgg/14378.html", "_computed": {"budget_wan": 8.0, "geo_relevance": {"score": 72, "tier": "高"}, "priority": "P2", "signals": ["🎓 公共采购"]}}, {"id": "GEO-2026-010", "company": "南昌航空大学科技学院", "industry": "教育", "title": "2026年招生宣传AI大模型词条优化服务采购", "status": "招标中", "budget": "4万元", "bid_deadline": "2026-05-29", "publish_date": "2026-05-22", "summary": "南昌航空大学科技学院AI大模型词条优化服务采购，预算4万元。需覆盖豆包、DeepSeek、文心一言、通义千问、Kimi、腾讯元宝等主流AI平台，提升品牌提及率和词条触发成功率。", "winner": "", "source_url": "http://www.yfbzb.com/inviteBid/detail/20260522_599259155.html", "_computed": {"budget_wan": 4.0, "geo_relevance": {"score": 100, "tier": "高"}, "priority": "P2", "signals": ["🎓 公共采购"]}}, {"id": "GEO-2026-011", "company": "浙东数字经济产业园运营中心", "industry": "产业园区/企业服务", "title": "GEO优化智能获客系统采购项目", "status": "已中标", "budget": "68.9万元", "bid_deadline": "2026-05-06", "publish_date": "2026-04-25", "summary": "浙东数字经济产业园运营中心GEO优化智能获客系统采购，竞争性谈判，中标金额68.9万元。含系统部署、地域标签配置、客流分析、区域投放优化、客户画像、数据看板及1年质保运维。", "winner": "武汉市仙念仙信息科技有限公司", "source_url": "http://www.zgggzy.com/jieguo/show.php?itemid=100000", "_computed": {"budget_wan": 68.9, "geo_relevance": {"score": 0, "tier": "低"}, "priority": "P2", "signals": ["🤖 AI智能体"]}}, {"id": "GEO-2026-012", "company": "奇瑞汽车", "industry": "汽车", "title": "2025年奇瑞营销产品SEO、GEO优化代理招标项目", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-01-20", "publish_date": "2026-01-14", "summary": "奇瑞汽车2025年营销产品SEO、GEO优化代理招标，采购编号CGXM-202601-0486。招标方为瑞鲸（安徽）供应链科技有限公司。2026年3月发布变更公告。", "winner": "", "source_url": "https://ebd.mychery.com/en/zd20=jsgcbg/20260310/1216064709006983168.html", "_computed": {"budget_wan": null, "geo_relevance": {"score": 0, "tier": "低"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-013", "company": "易招标（招采进宝）", "industry": "企业服务/招标", "title": "GEO优化服务采购项目", "status": "已中标", "budget": "含激励机制", "bid_deadline": "2026-04-23", "publish_date": "2026-04-16", "summary": "易招标平台自身就GEO优化服务进行采购，服务期至少90天，包含激励机制。招标采购平台自身采购GEO服务，体现了行业对GEO的认可。", "winner": "", "source_url": "https://china.zcjb.com.cn/cms/china/webfile/detail/index.html?contentId=1229839006590566400", "_computed": {"budget_wan": null, "geo_relevance": {"score": 0, "tier": "低"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-014", "company": "广州白云山医药集团", "industry": "医药/健康", "title": "系列产品官网制作搭建（含SEO&GEO）", "status": "招标中", "budget": "35万元", "bid_deadline": "2026-05-15", "publish_date": "2026-04-20", "summary": "广州白云山制药总厂系列产品官网制作搭建项目，明确包含SEO和GEO优化需求，预算35万元。官网建设+AI搜索优化一体化采购。", "winner": "", "source_url": "https://www.yichangke.com/hetian_hyxw/410.html", "_computed": {"budget_wan": 35.0, "geo_relevance": {"score": 12, "tier": "低"}, "priority": "P1", "signals": []}}, {"id": "GEO-2026-015", "company": "阿坝师范学院", "industry": "教育", "title": "2026年招生宣传AI优化呈现服务采购", "status": "已中标", "budget": "4.5万元", "bid_deadline": "2026-05-07", "publish_date": "2026-04-28", "summary": "阿坝师范学院2026年招生宣传AI优化呈现服务询价采购，预算4.5万元。要求在主流AI平台（豆包、DeepSeek、文心一言等）优化招生宣传信息展示。", "winner": "", "source_url": "https://jw.abtu.edu.cn/info/1131/5141.htm", "_computed": {"budget_wan": 4.5, "geo_relevance": {"score": 67, "tier": "高"}, "priority": "P2", "signals": ["🎓 公共采购"]}}, {"id": "GEO-2026-016", "company": "台湾工业技术研究院", "industry": "研究机构", "title": "产业学习网GEO改善分析研究", "status": "招标中", "budget": "未公开", "bid_deadline": "2026-05-30", "publish_date": "2026-05-20", "summary": "工研院就产业学习网GEO改善分析研究进行询价，要求AI搜索流量追踪、GEO改善建议、成效评估。采购编号2001802864。", "winner": "", "source_url": "https://quotaweb.itri.org.tw/showRFQ.aspx?rfqno=2001802864", "_computed": {"budget_wan": null, "geo_relevance": {"score": 12, "tier": "低"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-017", "company": "东风本田", "industry": "汽车", "title": "东风Honda 2026年GEO项目（生成式引擎优化）", "status": "已中标", "budget": "1207万元", "bid_deadline": "2025-03-16", "publish_date": "2025-02-13", "summary": "东风本田2026年GEO项目，在DeepSeek、Kimi、元宝、豆包、文心一言、通义千问等6个AI平台中针对预设问题持续推荐指定车型。要求维持至少1年推荐效果。中标方为新智科技发展有限公司，中标金额约1207万元。", "winner": "新智科技发展有限公司", "source_url": "https://www.bidchance.com/info-zhongbiao-95693f7b5995c646dd4ce3fffed20dbc.html", "_computed": {"budget_wan": 1207.0, "geo_relevance": {"score": 95, "tier": "高"}, "priority": "P1", "signals": ["💰 高预算(≥100万)"]}}, {"id": "GEO-2026-018", "company": "广汽汇理租赁", "industry": "汽车/金融", "title": "广汽汇理租赁品牌公关传播及GEO服务项目", "status": "已中标", "budget": "180万元", "bid_deadline": "2026-04-30", "publish_date": "2026-04-09", "summary": "广州广汽汇理融资租赁有限公司品牌公关传播及GEO服务项目，采购控制价180万元（总价包干）。第一中标候选人北京智慧星光信息技术股份有限公司（160万元），第二北京艾信博睿管理顾问有限公司（142.8万元），第三北京新智科技发展有限公司（146万元）。服务期两年。", "winner": "北京智慧星光信息技术股份有限公司", "source_url": "https://ygcg.gzggzy.cn/p92/fw3/20260507/393930.html", "_computed": {"budget_wan": 180.0, "geo_relevance": {"score": 0, "tier": "低"}, "priority": "P1", "signals": ["🏦 金融行业", "💰 高预算(≥100万)"]}}, {"id": "GEO-2026-019", "company": "中英人寿", "industry": "保险/金融", "title": "2026年中英人寿GEO（AI搜索引擎优化）项目", "status": "已中标", "budget": "未公开", "bid_deadline": "2026-04-01", "publish_date": "2026-04-02", "summary": "中英人寿2026年GEO（AI搜索引擎优化）项目，采购方式为谈判采购（分散）。成交供应商为数说故事人工智能科技股份有限公司。属于保险行业较早启动GEO采购的项目之一。", "winner": "数说故事人工智能科技股份有限公司", "source_url": "https://beijing.zhaobiao.cn/succeed_v_02ff8ee34ccd4f7874f6b9ca1691768d.html", "_computed": {"budget_wan": null, "geo_relevance": {"score": 12, "tier": "低"}, "priority": "P2", "signals": ["🏦 金融行业"]}}, {"id": "GEO-2026-020", "company": "五粮液", "industry": "酒业/快消", "title": "AI平台内容优化项目（GEO生成式引擎优化）", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-01-29", "publish_date": "2026-01-09", "summary": "四川五粮液浓香酒有限公司AI平台内容优化项目（实质为GEO），项目编号五粮液浓香招﹝2025﹞154号。要求在DeepSeek、豆包、元宝等主流AI平台进行品牌内容优化。服务期2026年1月至12月。五粮液电子招投标平台发布，需CFCA证书参与。", "winner": "", "source_url": "https://www.chinabidding.cn/zbgg/U-vzwzYjW.html", "_computed": {"budget_wan": null, "geo_relevance": {"score": 50, "tier": "高"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-021", "company": "中粮肉食", "industry": "食品/农业", "title": "2026年口碑舆情监测及SEO、GEO优化项目", "status": "已截止", "budget": "95万元", "bid_deadline": "2026-02-04", "publish_date": "2026-01-30", "summary": "中粮肉食投资有限公司2026年口碑舆情监测及SEO、GEO优化项目，最高限价95万元（含税）。项目编号GN2026-44-0706。采购代理为安徽省招标集团股份有限公司。服务期2026年2月至2027年1月。通过中粮E采供应链采购平台进行。", "winner": "", "source_url": "https://www.gc-zb.com.cn/markinfo/rMvvI1XXC9KPUT-b65U..A.html", "_computed": {"budget_wan": 95.0, "geo_relevance": {"score": 5, "tier": "低"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-022", "company": "海信集团", "industry": "家电/电子", "title": "海信集团管理品牌与营销GEO项目", "status": "已开标", "budget": "未公开", "bid_deadline": "2026-03-06", "publish_date": "2026-02-12", "summary": "海信集团控股股份有限公司管理品牌与营销GEO项目，招标编码ZB260212034。覆盖海信、东芝电视、容声、科龙、gorenje、ASKO、vidda等多品牌。包含GEO优化（KPI：各品线AI露出率平均提升30%）、GEO智能体（全链路数字化）、GEO转化承接三大板块。", "winner": "", "source_url": "https://mp.weixin.qq.com/s/__biz=MzYyMjEwMTExMw==&mid=2247484141&idx=1&sn=cdd82192639f8d7c22ecf4f052b84fd0", "_computed": {"budget_wan": null, "geo_relevance": {"score": 15, "tier": "低"}, "priority": "P2", "signals": ["🏢 多品牌覆盖", "🤖 AI智能体"]}}, {"id": "GEO-2026-023", "company": "中信建投证券", "industry": "证券/金融", "title": "GEO优化项目供应商征集", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-02-06", "publish_date": "2026-01-30", "summary": "中信建投证券GEO优化项目供应商征集。需求包括：合规内容优化（合规通过率≥95%）、多平台算法适配（核心词可见性提升80%以上）、全链路运营管控。供应商需近3年至少1个金融行业GEO/AI优化项目经验，团队不少于8人。", "winner": "", "source_url": "https://www.ygbid.com/tender/20260129165703900034.html", "_computed": {"budget_wan": null, "geo_relevance": {"score": 25, "tier": "中"}, "priority": "P2", "signals": ["🏦 金融行业"]}}, {"id": "GEO-2026-024", "company": "美团", "industry": "互联网/本地生活", "title": "2026年美团GEO广告采购供应商招募", "status": "已截止", "budget": "约1000万元", "bid_deadline": "2026-04-15", "publish_date": "2026-04-09", "summary": "美团2026年GEO广告采购供应商招募，合作期限2026年5月至2027年4月（年框制）。要求覆盖DeepSeek、豆包、千问、元宝、Kimi等AI平台，自研GEO优化系统语义匹配准确度≥98%，核心信息呈现率≥80%，每日每问题不少于30次监测。", "winner": "", "source_url": "https://mp.weixin.qq.com/s/__biz=MzkzNTY1NTA4Mw==&mid=2247485017&idx=1&sn=3dc533a2c092ade96ddb29ee94d8e227", "_computed": {"budget_wan": 1000.0, "geo_relevance": {"score": 88, "tier": "高"}, "priority": "P1", "signals": ["📅 年框制", "💰 高预算(≥100万)"]}}, {"id": "GEO-2026-025", "company": "知乎", "industry": "互联网/内容社区", "title": "2026年知乎商业品牌业务GEO年框供应商招募", "status": "已截止", "budget": "200万元", "bid_deadline": "2026-04-10", "publish_date": "2026-04-01", "summary": "知乎2026年商业品牌业务GEO年框供应商招募，年度预算200万元（不承诺保底）。合作周期至2027年6月30日。要求仅允许白帽GEO（优质原创、权威信源），严格禁止批量伪原创、算法攻击、恶意投喂等行为。需提供合规承诺及操作日志。", "winner": "", "source_url": "https://mp.weixin.qq.com/s/__biz=MzYyMjEwMTExMw==&mid=2247485023&idx=1&sn=4b33ee2c81b0e3b65faeccd26ec62327", "_computed": {"budget_wan": 200.0, "geo_relevance": {"score": 13, "tier": "低"}, "priority": "P1", "signals": ["📅 年框制", "💰 高预算(≥100万)"]}}, {"id": "GEO-2026-026", "company": "京东集团", "industry": "互联网/电商", "title": "京东集团CCO体系-公共关系部-GEO项目", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-05-15", "publish_date": "2026-05-08", "summary": "京东集团CCO体系公共关系部GEO项目，针对京东本地生活业务，在DeepSeek、Kimi、豆包、元宝等AI平台进行品牌信息占位与优化。要求注册资金≥100万，成立满2年，近2年完成3个及以上AI优化类项目，具备外卖/即时零售/生鲜电商经验优先。", "winner": "", "source_url": "http://m.ai8.com.cn/n-zb-64833468.html", "_computed": {"budget_wan": null, "geo_relevance": {"score": 77, "tier": "高"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-027", "company": "京东五星电器", "industry": "家电/零售", "title": "京东2026-家电家居事业群（五星）全国GEO优化服务商招标", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-04-27", "publish_date": "2026-04-15", "summary": "京东家电家居事业群（五星电器）全国GEO优化服务商招标，覆盖一二三线至少39城（京东电器、京东MALL）。需求包含品牌词/行业词/对比词AI语义优化（要求TOP3）、口碑风控（负面≤5%）、大促配合等。覆盖DeepSeek、豆包、千问、Kimi、文心一言及社媒平台。", "winner": "", "source_url": "https://www.qianlima.com/bid-589816268.html", "_computed": {"budget_wan": null, "geo_relevance": {"score": 60, "tier": "高"}, "priority": "P2", "signals": []}}, {"id": "GEO-2026-028", "company": "京东物流", "industry": "物流/供应链", "title": "京东物流国际官网SEO&GEO服务商招标项目", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-01-26", "publish_date": "2026-01-19", "summary": "京东物流国际官网SEO&GEO整合服务，合作周期1年。SEO以Google为主，GEO国内以DeepSeek、豆包为主，海外以ChatGPT、Gemini为主。要求文案团队需由英语及对应小语种母语人士组成，拒绝机器翻译。", "winner": "", "source_url": "https://mp.weixin.qq.com/s/__biz=MzA5NzE1Nzg5Nw==&mid=2247486852&idx=1&sn=3bf25afbf53db6b8304dbf9bd9114867", "_computed": {"budget_wan": null, "geo_relevance": {"score": 50, "tier": "高"}, "priority": "P2", "signals": ["🌐 国际GEO"]}}, {"id": "GEO-2026-029", "company": "太平洋健康险", "industry": "保险/金融", "title": "太平洋健康险2026年AI搜索优化服务（GEO）采购", "status": "已中标", "budget": "未公开", "bid_deadline": "2026-05-12", "publish_date": "2026-05-12", "summary": "太平洋健康险2026年AI搜索优化服务（GEO）采购项目，已进入中标公示阶段。太平洋健康险为中国太保旗下子公司，属于保险行业GEO采购先行者之一。", "winner": "", "source_url": "https://xiangmu.ibicn.com/tongxun/diqunizaijian/zhongbiao/page/10/", "_computed": {"budget_wan": null, "geo_relevance": {"score": 12, "tier": "低"}, "priority": "P2", "signals": ["🏦 金融行业"]}}, {"id": "GEO-2026-030", "company": "四川广电传媒", "industry": "传媒/文化", "title": "GEO系统技术支持服务采购项目", "status": "已截止", "budget": "15万元", "bid_deadline": "2026-04-02", "publish_date": "2026-03-30", "summary": "四川广电传媒集团有限公司GEO系统技术支持服务采购项目，采购编号ZHH-WCS-202627，预算15万元。竞争性磋商采购。采购代理为四川中汇恒工程项目管理咨询有限公司。注：项目名称中的GEO可能指生成式引擎优化或地理信息系统，需进一步确认。", "winner": "", "source_url": "http://www.sctv.com/announcement/2037447329052442625", "_computed": {"budget_wan": 15.0, "geo_relevance": {"score": 0, "tier": "低"}, "priority": "P2", "signals": []}}], "status_summary": {"已截止": 14, "采购意向": 1, "已中标": 9, "招标中": 6, "已开标": 2, "已成交": 1}, "industry_distribution": {"短交通/出行": 1, "教育": 4, "快消/饮料": 1, "医药/健康": 4, "通信/云计算": 1, "建材/家居": 2, "政府/旅游": 1, "航空航天/电子": 1, "产业园区/企业服务": 1, "汽车": 2, "企业服务/招标": 1, "研究机构": 1, "汽车/金融": 1, "保险/金融": 2, "酒业/快消": 1, "食品/农业": 1, "家电/电子": 1, "证券/金融": 1, "互联网/本地生活": 1, "互联网/内容社区": 1, "互联网/电商": 1, "家电/零售": 1, "物流/供应链": 1, "传媒/文化": 1}};
+</script>
 
-async function loadData() {
-  try {
-    const resp = await fetch('bidding_data.json');
-    data = await resp.json();
-    render();
-  } catch(e) {
-    // Fallback: try inline data
-    document.getElementById('projectCount').textContent = '数据加载失败';
+<script>
+var data = null;
+
+// ===== Tab Switching =====
+function switchTab(name) {
+  document.querySelectorAll('.tab-pane').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelector('.tab-btn[onclick*="' + name + '"]').classList.add('active');
+  location.hash = name;
+  if (name === 'trends' && data) renderTrends();
+  if (name === 'analysis' && data) renderAnalysisHistory();
+}
+
+// ===== Data Enrichment =====
+var CHART_COLORS = ['#302b63','#e94560','#27ae60','#e67e22','#2980b9','#8e44ad','#1abc9c','#e74c3c','#95a5a6','#f39c12','#2ecc71','#3498db'];
+
+function parseBudgetWan(budgetStr) {
+  if (!budgetStr || budgetStr === '未公开') return null;
+  var m = budgetStr.match(/([\d.]+)\s*万元/);
+  if (m) return parseFloat(m[1]);
+  m = budgetStr.match(/约\s*([\d.]+)\s*万/);
+  if (m) return parseFloat(m[1]);
+  return null;
+}
+
+function computeGeoRelevance(p) {
+  var text = (p.title + ' ' + p.summary).toLowerCase();
+  var keywords = {
+    'deepseek': 15, '豆包': 15, '文心一言': 15, '通义千问': 15,
+    'kimi': 15, '元宝': 10, 'ai平台': 10, '多平台': 8,
+    '年框': 8, 'kpi': 5, '语义匹配': 10, '合规': 5,
+    '露出率': 10, '监测': 5, 'chatgpt': 10, 'gemini': 10,
+    'ai搜索': 12, 'ai优化': 12, '大模型': 10, '词条': 5
+  };
+  var score = 0;
+  for (var kw in keywords) {
+    if (text.indexOf(kw) > -1) score += keywords[kw];
   }
+  var tier = score >= 50 ? '高' : (score >= 20 ? '中' : '低');
+  return { score: Math.min(score, 100), tier: tier };
+}
+
+function computePriority(p) {
+  var budget = parseBudgetWan(p.budget);
+  var isActive = (p.status === '招标中' || p.status === '已开标');
+  if (budget !== null && budget >= 100 && isActive) return 'P0';
+  if (budget !== null && budget >= 30 && isActive) return 'P1';
+  if (budget !== null && budget >= 100) return 'P1';
+  return 'P2';
+}
+
+function detectTrendSignals(p) {
+  var signals = [];
+  var text = p.title + ' ' + p.summary;
+  if (text.indexOf('政府') > -1 || p.industry === '政府/旅游') signals.push('🏛 政府采购');
+  if (text.indexOf('金融') > -1 || p.industry.indexOf('金融') > -1) signals.push('🏦 金融行业');
+  if (text.indexOf('年框') > -1) signals.push('📅 年框制');
+  if (text.indexOf('国际') > -1 || text.indexOf('海外') > -1 || text.indexOf('gemini') > -1) signals.push('🌐 国际GEO');
+  if (parseBudgetWan(p.budget) !== null && parseBudgetWan(p.budget) >= 100) signals.push('💰 高预算(≥100万)');
+  if (p.industry === '教育' || p.industry === '政府/旅游') signals.push('🎓 公共采购');
+  if (text.indexOf('多品牌') > -1 || text.indexOf('多品类') > -1) signals.push('🏢 多品牌覆盖');
+  if (text.indexOf('智能体') > -1 || text.indexOf('智能获客') > -1) signals.push('🤖 AI智能体');
+  return signals;
+}
+
+function enrichProject(p) {
+  if (p._computed) return;
+  p._computed = {
+    budget_wan: parseBudgetWan(p.budget),
+    geo_relevance: computeGeoRelevance(p),
+    priority: computePriority(p),
+    signals: detectTrendSignals(p)
+  };
+}
+
+function enrichAll() {
+  for (var i = 0; i < data.projects.length; i++) {
+    enrichProject(data.projects[i]);
+  }
+}
+
+function getDomain(url) {
+  try { return new URL(url).hostname.replace('www.', ''); } catch(e) { return url; }
+}
+
+function extractSourceName(url) {
+  var domain = getDomain(url);
+  var map = {
+    'szecp.crc.com.cn': '华润守正招标平台', 'yangzijiang.com': '扬子江药业官网',
+    'ygbid.com': '阳光招标平台', 'zfcg.czj.ningbo.gov.cn': '宁波政府采购网',
+    'yfbzb.com': '易丰招标平台', 'hejuncollege.com': '和君职业学院官网',
+    'zgggzy.com': '公共资源交易网', 'ebd.mychery.com': '奇瑞采购平台',
+    'china.zcjb.com.cn': '招采进宝平台', 'yichangke.com': '易常客平台',
+    'jw.abtu.edu.cn': '阿坝师范学院官网', 'quotaweb.itri.org.tw': '台湾工研院采购网',
+    'bidding.shu.edu.cn': '上海大学招标网', 'bidchance.com': '招标网',
+    'ygcg.gzggzy.cn': '广州公共资源交易中心', 'beijing.zhaobiao.cn': '北京招标网',
+    'chinabidding.cn': '中国采购与招标网', 'gc-zb.com.cn': '国采招标平台',
+    'mp.weixin.qq.com': '微信公众号', 'ai8.com.cn': '中国能源招标网',
+    'qianlima.com': '千里马招标网', 'xiangmu.ibicn.com': '项目信息网',
+    'sctv.com': '四川广播电视台官网', 'chinabidding.com.cn': '中国采购与招标网'
+  };
+  return map[domain] || domain;
+}
+
+function startApp() {
+  var hash = location.hash.replace('#', '');
+  fetch('bidding_data.json')
+    .then(function(r) { return r.json(); })
+    .then(function(json) { data = json; enrichAll(); render(); })
+    .catch(function() { data = INLINE_DATA; enrichAll(); render(); });
 }
 
 function statusTag(status) {
-  const map = {
-    '招标中': 'tag-bidding',
-    '已中标': 'tag-awarded',
-    '已成交': 'tag-completed',
-    '情报收集': 'tag-info'
-  };
-  return `<span class="tag ${map[status] || 'tag-info'}">${status}</span>`;
+  var map = { '招标中': 'tag-bidding', '已中标': 'tag-awarded', '已成交': 'tag-completed', '已截止': 'tag-info', '已开标': 'tag-awarded', '采购意向': 'tag-info', '情报收集': 'tag-info' };
+  return '<span class="tag ' + (map[status] || 'tag-info') + '">' + status + '</span>';
 }
 
+// ===== Browse Tab =====
 function renderStats() {
-  const stats = data.status_summary;
-  const cards = [
-    { label: '已中标/成交', num: (stats['已中标']||0)+(stats['已成交']||0), cls: 'green' },
-    { label: '招标中', num: stats['招标中']||0, cls: 'orange' },
-    { label: '情报收集中', num: stats['情报收集']||0, cls: 'purple' },
-    { label: '覆盖行业', num: Object.keys(data.industry_distribution).length, cls: 'blue' }
+  var stats = data.status_summary;
+  var active = stats['招标中'] || 0;
+  var awarded = (stats['已中标']||0) + (stats['已成交']||0);
+  var total = data.projects.length;
+  var industries = Object.keys(data.industry_distribution).length;
+  var totalBudget = 0, budgetCount = 0, maxBudget = 0;
+  for (var i = 0; i < data.projects.length; i++) {
+    var bw = data.projects[i]._computed.budget_wan;
+    if (bw !== null) { totalBudget += bw; budgetCount++; if (bw > maxBudget) maxBudget = bw; }
+  }
+  var cards = [
+    { label: '项目总数', num: total, cls: 'blue' },
+    { label: '招标中', num: active, cls: 'orange' },
+    { label: '已中标/成交', num: awarded, cls: 'green' },
+    { label: '覆盖行业', num: industries, cls: 'purple' }
   ];
-  document.getElementById('stats').innerHTML = cards.map(c =>
-    `<div class="stat-card ${c.cls}"><div class="num">${c.num}</div><div class="label">${c.label}</div></div>`
-  ).join('');
-  document.getElementById('projectCount').textContent = `共 ${data.projects.length} 个项目`;
-  document.getElementById('updateInfo').textContent = `最后更新：${data.meta.last_updated} | 数据来源：${data.meta.data_sources.join('、')}`;
+  if (budgetCount > 0) {
+    cards.push({ label: '已知预算总额', num: Math.round(totalBudget) + '万', cls: 'red' });
+    cards.push({ label: '最高预算', num: maxBudget + '万', cls: 'red' });
+  }
+  var html = '';
+  for (var i = 0; i < cards.length; i++) {
+    html += '<div class="stat-card ' + cards[i].cls + '"><div class="num">' + cards[i].num + '</div><div class="label">' + cards[i].label + '</div></div>';
+  }
+  document.getElementById('stats').innerHTML = html;
+  document.getElementById('projectCount').textContent = '共 ' + total + ' 个项目';
+  document.getElementById('updateInfo').textContent = '最后更新：' + data.meta.last_updated + ' | ' + data.meta.data_sources.length + ' 个数据来源';
 }
 
-function renderIndustryFilter() {
-  const sel = document.getElementById('industryFilter');
-  const industries = Object.keys(data.industry_distribution).sort();
-  sel.innerHTML = '<option value="all">全部行业</option>' +
-    industries.map(i => `<option value="${i}">${i} (${data.industry_distribution[i]})</option>`).join('');
+function renderFilters() {
+  var statusSel = document.getElementById('statusFilter');
+  var statusCounts = {};
+  for (var i = 0; i < data.projects.length; i++) {
+    var s = data.projects[i].status;
+    statusCounts[s] = (statusCounts[s] || 0) + 1;
+  }
+  var statusOrder = ['招标中', '已开标', '已中标', '已成交', '已截止', '采购意向', '情报收集'];
+  var html = '<option value="all">全部状态</option>';
+  for (var si = 0; si < statusOrder.length; si++) {
+    var s = statusOrder[si];
+    if (statusCounts[s]) html += '<option value="' + s + '">' + s + ' (' + statusCounts[s] + ')</option>';
+  }
+  statusSel.innerHTML = html;
+
+  var indSel = document.getElementById('industryFilter');
+  var industries = Object.keys(data.industry_distribution).sort();
+  html = '<option value="all">全部行业</option>';
+  for (var ii = 0; ii < industries.length; ii++) {
+    html += '<option value="' + industries[ii] + '">' + industries[ii] + ' (' + data.industry_distribution[industries[ii]] + ')</option>';
+  }
+  indSel.innerHTML = html;
 }
 
 function filterProjects() {
-  const status = document.getElementById('statusFilter').value;
-  const industry = document.getElementById('industryFilter').value;
-  const query = document.getElementById('searchInput').value.toLowerCase();
+  var status = document.getElementById('statusFilter').value;
+  var industry = document.getElementById('industryFilter').value;
+  var query = document.getElementById('searchInput').value.toLowerCase();
+  var sort = document.getElementById('sortSelect').value;
 
-  let filtered = data.projects.filter(p => {
-    if (status !== 'all' && p.status !== status) return false;
-    if (industry !== 'all' && p.industry !== industry) return false;
-    if (query && !p.company.toLowerCase().includes(query) && !p.title.toLowerCase().includes(query)) return false;
-    return true;
+  var filtered = [];
+  for (var i = 0; i < data.projects.length; i++) {
+    var p = data.projects[i];
+    if (status !== 'all' && p.status !== status) continue;
+    if (industry !== 'all' && p.industry !== industry) continue;
+    if (query) {
+      var match = p.company.toLowerCase().indexOf(query) > -1 ||
+                  p.title.toLowerCase().indexOf(query) > -1 ||
+                  p.summary.toLowerCase().indexOf(query) > -1;
+      if (!match) continue;
+    }
+    filtered.push(p);
+  }
+
+  var statusOrder = { '招标中': 0, '已开标': 1, '已中标': 2, '已成交': 3, '已截止': 4, '采购意向': 5, '情报收集': 6 };
+  filtered.sort(function(a, b) {
+    var oa = statusOrder[a.status] !== undefined ? statusOrder[a.status] : 99;
+    var ob = statusOrder[b.status] !== undefined ? statusOrder[b.status] : 99;
+    if (oa !== ob) return oa - ob;
+
+    var va, vb;
+    switch (sort) {
+      case 'budget-desc':
+        va = a._computed.budget_wan || 0; vb = b._computed.budget_wan || 0;
+        return vb - va;
+      case 'budget-asc':
+        va = a._computed.budget_wan || 99999; vb = b._computed.budget_wan || 99999;
+        return va - vb;
+      case 'geo-desc':
+        return (b._computed.geo_relevance.score || 0) - (a._computed.geo_relevance.score || 0);
+      case 'date-desc':
+        return (b.publish_date || '').localeCompare(a.publish_date || '');
+      case 'date-asc':
+        return (a.publish_date || '').localeCompare(b.publish_date || '');
+      default:
+        return (b.publish_date || '').localeCompare(a.publish_date || '');
+    }
   });
 
-  // Sort: 招标中 first, then by date desc
-  filtered.sort((a, b) => {
-    const order = { '招标中': 0, '已中标': 1, '已成交': 2, '情报收集': 3 };
-    if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
-    return (b.publish_date || '').localeCompare(a.publish_date || '');
-  });
+  document.getElementById('resultCount').textContent = filtered.length === data.projects.length ? '' : filtered.length + ' / ' + data.projects.length;
 
-  const list = document.getElementById('projectList');
+  var list = document.getElementById('projectList');
   if (filtered.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">没有匹配的项目</div>';
+    list.innerHTML = '<div class="empty-state"><div class="emoji">🔍</div><p>没有匹配的项目</p></div>';
     return;
   }
 
-  list.innerHTML = filtered.map(p => `
-    <div class="project">
-      <div class="top">
-        <div>
-          <div class="company">${p.company} ${statusTag(p.status)}</div>
-          <div class="industry">${p.industry}</div>
-        </div>
-        <div class="meta">
-          ${p.budget ? `<span>💰 ${p.budget}</span>` : ''}
-          ${p.publish_date ? `<span>📅 ${p.publish_date}</span>` : ''}
-          ${p.bid_deadline ? `<span>⏰ 截止: ${p.bid_deadline}</span>` : ''}
-        </div>
-      </div>
-      <div class="title">${p.title}</div>
-      <div class="summary">${p.summary}</div>
-      ${p.winner ? `<div class="summary">🏆 中标方：${p.winner}</div>` : ''}
-      ${p.source_url ? `<div class="link"><a href="${p.source_url}" target="_blank">🔗 查看原文</a></div>` : ''}
-    </div>
-  `).join('');
+  var html = '';
+  for (var i = 0; i < filtered.length; i++) {
+    var p = filtered[i];
+    var c = p._computed;
+    var geoClass = 'badge-geo-' + (c.geo_relevance.tier === '高' ? 'high' : c.geo_relevance.tier === '中' ? 'mid' : 'low');
+
+    html += '<div class="project">';
+    html += '<div class="top"><div>';
+    html += '<div class="company">' + p.company + ' ' + statusTag(p.status) + '</div>';
+    html += '<span class="industry-tag">' + p.industry + '</span>';
+    html += '</div><div class="meta">';
+    if (p.budget && p.budget != '未公开') html += '<span>💰 ' + p.budget + '</span>';
+    if (p.publish_date) html += '<span>📅 ' + p.publish_date + '</span>';
+    if (p.bid_deadline) html += '<span>⏰ 截止 ' + p.bid_deadline + '</span>';
+    html += '</div></div>';
+    html += '<div class="title">' + p.title + '</div>';
+    html += '<div class="project-badges">';
+    html += '<span class="tag ' + geoClass + '">GEO ' + c.geo_relevance.tier + '(' + c.geo_relevance.score + ')</span>';
+    html += '<span class="tag badge-' + c.priority.toLowerCase() + '">' + c.priority + '</span>';
+    for (var si = 0; si < c.signals.length; si++) {
+      html += '<span class="signal-tag">' + c.signals[si] + '</span>';
+    }
+    html += '</div>';
+    html += '<div class="summary">' + p.summary + '</div>';
+    if (p.winner) html += '<div class="winner-line">🏆 中标方：' + p.winner + '</div>';
+    if (p.source_url) {
+      var source = extractSourceName(p.source_url);
+      html += '<div class="link"><a href="' + p.source_url + '" target="_blank" rel="noopener">查看原文</a><span class="source-domain">' + source + '</span></div>';
+    }
+    html += '</div>';
+  }
+  list.innerHTML = html;
 }
 
+// ===== Trends Tab =====
+function renderMonthlyTrend() {
+  var monthCount = {};
+  for (var i = 0; i < data.projects.length; i++) {
+    var d = data.projects[i].publish_date;
+    if (!d) continue;
+    var m = d.substring(0, 7);
+    monthCount[m] = (monthCount[m] || 0) + 1;
+  }
+  var months = Object.keys(monthCount).sort();
+  if (months.length === 0) { document.getElementById('monthlyTrendChart').innerHTML = '<div class="empty-state"><p>数据不足</p></div>'; return; }
+
+  var maxVal = 0;
+  for (var mi = 0; mi < months.length; mi++) { if (monthCount[months[mi]] > maxVal) maxVal = monthCount[months[mi]]; }
+
+  var html = '<div class="chart-column-container">';
+  for (var mi = 0; mi < months.length; mi++) {
+    var val = monthCount[months[mi]];
+    var h = Math.max((val / maxVal) * 160, 4);
+    html += '<div class="chart-column"><div class="col-fill" style="height:' + h + 'px;background:' + CHART_COLORS[mi % CHART_COLORS.length] + '"></div><div class="col-label">' + months[mi] + '</div><div style="font-size:10px;color:#999;margin-top:2px">' + val + '</div></div>';
+  }
+  html += '</div>';
+  document.getElementById('monthlyTrendChart').innerHTML = html;
+}
+
+function renderIndustryChart() {
+  var items = [];
+  for (var ind in data.industry_distribution) {
+    items.push({ label: ind, value: data.industry_distribution[ind] });
+  }
+  items.sort(function(a,b) { return b.value - a.value; });
+  var maxVal = items[0].value;
+
+  // Doughnut for top 8 + other
+  var showItems = items.slice(0, 8);
+  var otherSum = 0;
+  for (var i = 8; i < items.length; i++) otherSum += items[i].value;
+  if (otherSum > 0) showItems.push({ label: '其他', value: otherSum });
+
+  var total = 0;
+  for (var i = 0; i < showItems.length; i++) total += showItems[i].value;
+
+  // Doughnut
+  var conic = '';
+  var cumPct = 0;
+  for (var i = 0; i < showItems.length; i++) {
+    var pct = (showItems[i].value / total) * 100;
+    var color = CHART_COLORS[i % CHART_COLORS.length];
+    conic += color + ' ' + cumPct + '% ' + (cumPct + pct) + '%,';
+    cumPct += pct;
+  }
+  conic = conic.slice(0, -1);
+
+  var html = '<div class="chart-doughnut" style="background:conic-gradient(' + conic + ')"><div class="chart-doughnut-center"><span class="num">' + total + '</span><span class="label">总计</span></div></div>';
+  html += '<div class="chart-legend">';
+  for (var i = 0; i < showItems.length; i++) {
+    html += '<span class="chart-legend-item"><span class="chart-legend-dot" style="background:' + CHART_COLORS[i % CHART_COLORS.length] + '"></span>' + showItems[i].label + ' (' + showItems[i].value + ')</span>';
+  }
+  html += '</div>';
+
+  document.getElementById('industryChart').innerHTML = html;
+}
+
+function renderBudgetChart() {
+  var buckets = { '<10万': 0, '10-50万': 0, '50-100万': 0, '100-500万': 0, '≥500万': 0, '未公开': 0 };
+  var bucketKeys = ['<10万', '10-50万', '50-100万', '100-500万', '≥500万'];
+  for (var i = 0; i < data.projects.length; i++) {
+    var bw = data.projects[i]._computed.budget_wan;
+    if (bw === null) { buckets['未公开']++; continue; }
+    if (bw < 10) buckets['<10万']++;
+    else if (bw < 50) buckets['10-50万']++;
+    else if (bw < 100) buckets['50-100万']++;
+    else if (bw < 500) buckets['100-500万']++;
+    else buckets['≥500万']++;
+  }
+
+  var maxVal = 0;
+  for (var bk = 0; bk < bucketKeys.length; bk++) { if (buckets[bucketKeys[bk]] > maxVal) maxVal = buckets[bucketKeys[bk]]; }
+
+  var html = '<div class="chart-subtitle">已公开预算: ' + (data.projects.length - buckets['未公开']) + '/' + data.projects.length + ' 个项目</div>';
+  for (var bk = 0; bk < bucketKeys.length; bk++) {
+    var val = buckets[bucketKeys[bk]];
+    var pct = maxVal > 0 ? (val / maxVal) * 100 : 0;
+    html += '<div class="chart-bar-row"><span class="chart-bar-label">' + bucketKeys[bk] + '</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:' + pct + '%;background:' + CHART_COLORS[bk % CHART_COLORS.length] + '"></div></div><span class="chart-bar-value">' + val + ' 个</span></div>';
+  }
+  html += '<div class="chart-bar-row"><span class="chart-bar-label">未公开</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:100%;background:#eee"></div></div><span class="chart-bar-value">' + buckets['未公开'] + ' 个</span></div>';
+
+  document.getElementById('budgetChart').innerHTML = html;
+}
+
+function renderProviderChart() {
+  var providerCount = {};
+  for (var i = 0; i < data.projects.length; i++) {
+    var w = data.projects[i].winner;
+    if (!w) continue;
+    var parts = w.split(/[、,，]/);
+    for (var pi = 0; pi < parts.length; pi++) {
+      var name = parts[pi].trim();
+      if (name) providerCount[name] = (providerCount[name] || 0) + 1;
+    }
+  }
+  var items = [];
+  for (var name in providerCount) items.push({ label: name, value: providerCount[name] });
+  items.sort(function(a,b) { return b.value - a.value; });
+  items = items.slice(0, 10);
+
+  if (items.length === 0) {
+    document.getElementById('providerChart').innerHTML = '<div class="empty-state"><p>暂无中标数据</p></div>';
+    return;
+  }
+
+  var maxVal = items[0].value;
+  var html = '<div class="chart-subtitle">已知中标: ' + items.length + ' 家服务商</div>';
+  for (var i = 0; i < items.length; i++) {
+    var pct = (items[i].value / maxVal) * 100;
+    html += '<div class="chart-bar-row"><span class="rank">' + (i+1) + '</span><span class="chart-bar-label" style="min-width:120px;text-align:left">' + items[i].label + '</span><div class="chart-bar-track"><div class="chart-bar-fill" style="width:' + pct + '%;background:' + CHART_COLORS[i % CHART_COLORS.length] + '"></div></div><span class="chart-bar-value">' + items[i].value + ' 次</span></div>';
+  }
+  document.getElementById('providerChart').innerHTML = html;
+}
+
+function renderTrends() {
+  renderMonthlyTrend();
+  renderIndustryChart();
+  renderBudgetChart();
+  renderProviderChart();
+}
+
+// ===== Analysis Tab =====
+var ANALYSIS_KEYWORDS = {
+  'deepseek': 15, '豆包': 15, '文心一言': 15, '通义千问': 15,
+  'kimi': 15, '元宝': 10, 'chatgpt': 10, 'gemini': 10,
+  'ai平台': 10, '多平台': 8, '年框': 8, 'ai搜索': 12,
+  'ai优化': 12, '大模型': 10
+};
+
+function extractClient(text) {
+  var patterns = [/招标[人方][：:]?\s*([^\s，,。]+)/, /采购[人方][：:]?\s*([^\s，,。]+)/, /业主[：:]?\s*([^\s，,。]+)/, /甲方[：:]?\s*([^\s，,。]+)/];
+  for (var i = 0; i < patterns.length; i++) {
+    var m = text.match(patterns[i]);
+    if (m) return m[1];
+  }
+  return '';
+}
+
+function extractBudget(text) {
+  var m = text.match(/([\d.]+)\s*万元/);
+  if (m) return m[0];
+  m = text.match(/预算[：:]?\s*([^\s，,。]+)/);
+  if (m) return m[1];
+  return '';
+}
+
+function extractDeadline(text) {
+  var m = text.match(/截止[^：:]*[：:]?\s*(\d{4}[-年]\d{1,2}[-月]\d{1,2})/);
+  if (m) return m[1].replace('年','-').replace('月','-');
+  return '';
+}
+
+function extractTitle(text) {
+  var m = text.match(/项目名[称][：:]?\s*([^\n\r]+)/);
+  if (m) return m[1].trim();
+  var lines = text.split('\n');
+  for (var i = 0; i < lines.length; i++) {
+    var l = lines[i].trim();
+    if (l.indexOf('项目') > -1 && l.length < 60) return l;
+  }
+  return '';
+}
+
+function computeTextGeoRelevance(text) {
+  var lower = text.toLowerCase();
+  var score = 0;
+  for (var kw in ANALYSIS_KEYWORDS) {
+    if (lower.indexOf(kw) > -1) score += ANALYSIS_KEYWORDS[kw];
+  }
+  var tier = score >= 50 ? '高' : (score >= 20 ? '中' : '低');
+  return { score: Math.min(score, 100), tier: tier };
+}
+
+function computeTextPriority(budgetStr) {
+  var m = budgetStr.match(/([\d.]+)/);
+  if (m) {
+    var val = parseFloat(m[1]);
+    if (val >= 100) return 'P0';
+    if (val >= 30) return 'P1';
+  }
+  return 'P2';
+}
+
+function detectTextSignals(text) {
+  var signals = [];
+  if (text.indexOf('政府') > -1) signals.push('🏛 政府采购');
+  if (text.indexOf('金融') > -1) signals.push('🏦 金融行业');
+  if (text.indexOf('年框') > -1) signals.push('📅 年框制');
+  if (text.indexOf('国际') > -1 || text.indexOf('海外') > -1) signals.push('🌐 国际GEO');
+  if (text.indexOf('智能体') > -1) signals.push('🤖 AI智能体');
+  return signals;
+}
+
+function runAnalysis() {
+  var text = document.getElementById('analysisInput').value.trim();
+  if (!text) { alert('请输入招标信息文本'); return; }
+
+  var client = extractClient(text);
+  var budget = extractBudget(text);
+  var deadline = extractDeadline(text);
+  var title = extractTitle(text);
+  var geo = computeTextGeoRelevance(text);
+  var priority = computeTextPriority(budget);
+  var signals = detectTextSignals(text);
+
+  var result = {
+    id: 'A-' + Date.now().toString(36),
+    client: client, budget: budget, deadline: deadline,
+    title: title, geo: geo, priority: priority,
+    signals: signals, raw: text,
+    created: new Date().toISOString().substring(0, 10),
+    notes: ''
+  };
+
+  renderAnalysisResult(result);
+}
+
+function renderAnalysisResult(result) {
+  var signalsHtml = '';
+  for (var i = 0; i < result.signals.length; i++) {
+    signalsHtml += '<span class="signal-tag">' + result.signals[i] + '</span>';
+  }
+
+  var geoClass = 'badge-geo-' + (result.geo.tier === '高' ? 'high' : result.geo.tier === '中' ? 'mid' : 'low');
+  var priorityClass = 'badge-' + result.priority.toLowerCase();
+
+  var html = '<div class="analysis-result">';
+  html += '<div class="field"><span class="field-label">甲方/采购方</span><span class="field-value editable" contenteditable="true">' + (result.client || '待确认') + '</span></div>';
+  html += '<div class="field"><span class="field-label">项目名称</span><span class="field-value editable" contenteditable="true">' + (result.title || '待确认') + '</span></div>';
+  html += '<div class="field"><span class="field-label">预算/金额</span><span class="field-value editable" contenteditable="true">' + (result.budget || '未公开') + '</span></div>';
+  html += '<div class="field"><span class="field-label">截止日期</span><span class="field-value editable" contenteditable="true">' + (result.deadline || '未知') + '</span></div>';
+  html += '<div class="field"><span class="field-label">GEO相关度</span><span class="field-value"><span class="tag ' + geoClass + '">' + result.geo.tier + ' (' + result.geo.score + '分)</span></span></div>';
+  html += '<div class="field"><span class="field-label">优先级</span><span class="field-value"><span class="tag ' + priorityClass + '">' + result.priority + '</span></span></div>';
+  html += '<div class="field"><span class="field-label">趋势信号</span><span class="field-value">' + (signalsHtml || '<span style="color:#ccc">无</span>') + '</span></div>';
+  html += '<div class="field" style="border-bottom:none"><span class="field-label">情报解读</span><span class="field-value editable" contenteditable="true" style="min-height:40px">' + (result.notes || '') + '</span></div>';
+  html += '</div>';
+  html += '<div class="analysis-actions" style="margin-top:16px">';
+  html += '<button class="btn-primary" onclick="saveAnalysis()">💾 保存到本地</button>';
+  html += '<button class="btn-secondary" onclick="copyAnalysisJSON()">📋 复制JSON</button>';
+  html += '<button class="btn-secondary" onclick="exportAnalysisJSON()">📥 导出下载</button>';
+  html += '</div>';
+
+  document.getElementById('analysisResult').innerHTML = html;
+  window._lastAnalysis = result;
+}
+
+function getResultFields() {
+  var fields = document.querySelectorAll('#analysisResult .field-value.editable');
+  if (!window._lastAnalysis) return null;
+  var r = JSON.parse(JSON.stringify(window._lastAnalysis));
+  if (fields.length >= 1) r.client = fields[0].textContent.trim();
+  if (fields.length >= 2) r.title = fields[1].textContent.trim();
+  if (fields.length >= 3) r.budget = fields[2].textContent.trim();
+  if (fields.length >= 4) r.deadline = fields[3].textContent.trim();
+  if (fields.length >= 8) r.notes = fields[7].textContent.trim();
+  return r;
+}
+
+function saveAnalysis() {
+  var r = getResultFields();
+  if (!r) return;
+  var saved = JSON.parse(localStorage.getItem('geo_analyses') || '[]');
+  saved.unshift(r);
+  localStorage.setItem('geo_analyses', JSON.stringify(saved));
+  renderAnalysisHistory();
+  alert('已保存分析记录');
+}
+
+function copyAnalysisJSON() {
+  var r = getResultFields();
+  if (!r) return;
+  var json = JSON.stringify(r, null, 2);
+  navigator.clipboard.writeText(json).then(function() { alert('JSON 已复制到剪贴板'); });
+}
+
+function exportAnalysisJSON() {
+  var r = getResultFields();
+  if (!r) return;
+  var blob = new Blob([JSON.stringify(r, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'geo-analysis-' + r.id + '.json';
+  a.click();
+}
+
+function deleteAnalysis(id) {
+  var saved = JSON.parse(localStorage.getItem('geo_analyses') || '[]');
+  saved = saved.filter(function(item) { return item.id !== id; });
+  localStorage.setItem('geo_analyses', JSON.stringify(saved));
+  renderAnalysisHistory();
+}
+
+function renderAnalysisHistory() {
+  var saved = JSON.parse(localStorage.getItem('geo_analyses') || '[]');
+  var container = document.getElementById('analysisHistory');
+  if (saved.length === 0) {
+    container.innerHTML = '<div class="analysis-empty"><p>暂无保存的分析记录</p></div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < saved.length; i++) {
+    var r = saved[i];
+    html += '<div class="analysis-history-item"><div class="info"><span class="name">' + (r.client || '未知甲方') + '</span> <span class="detail">' + (r.budget || '预算未知') + ' · ' + r.created + ' · P' + r.priority.replace('P','') + '</span></div>';
+    html += '<button class="del-btn" onclick="deleteAnalysis(\'' + r.id + '\')">×</button></div>';
+  }
+  container.innerHTML = html;
+}
+
+// ===== Main Render =====
 function render() {
   renderStats();
-  renderIndustryFilter();
+  renderFilters();
   filterProjects();
+  var hash = location.hash.replace('#', '');
+  if (hash === 'trends') { switchTab('trends'); renderTrends(); }
+  if (hash === 'analysis') { switchTab('analysis'); renderAnalysisHistory(); }
 }
 
-loadData();
+startApp();
+
 </script>
 
 </body>
