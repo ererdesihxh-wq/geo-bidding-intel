@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEO招投标情报站</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #1a1a2e; line-height: 1.6; }
+  .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; padding: 40px 20px; text-align: center; }
+  .header h1 { font-size: 28px; margin-bottom: 8px; }
+  .header p { opacity: .8; font-size: 14px; }
+  .header .badge { display: inline-block; background: #e94560; color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 12px; margin-top: 12px; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: #fff; border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .stat-card .num { font-size: 28px; font-weight: 700; color: #1a1a2e; }
+  .stat-card .label { font-size: 12px; color: #666; margin-top: 4px; }
+  .stat-card.green .num { color: #27ae60; }
+  .stat-card.orange .num { color: #e67e22; }
+  .stat-card.blue .num { color: #2980b9; }
+  .stat-card.purple .num { color: #8e44ad; }
+  .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filters select, .filters input { padding: 8px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; }
+  .filters select { min-width: 120px; }
+  .filters input { flex: 1; min-width: 200px; }
+  .update-info { font-size: 12px; color: #999; margin-bottom: 16px; }
+
+  .project { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); transition: box-shadow .2s; }
+  .project:hover { box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+  .project .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .project .company { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+  .project .industry { font-size: 12px; color: #666; }
+  .project .title { font-size: 14px; color: #333; margin: 8px 0; line-height: 1.5; }
+  .project .meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: #666; }
+  .project .meta span { display: flex; align-items: center; gap: 4px; }
+  .project .summary { font-size: 13px; color: #555; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f0; }
+  .project .link { margin-top: 10px; }
+  .project .link a { font-size: 12px; color: #2980b9; text-decoration: none; }
+  .project .link a:hover { text-decoration: underline; }
+
+  .tag { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 12px; font-weight: 500; }
+  .tag-bidding { background: #e8f5e9; color: #27ae60; }
+  .tag-awarded { background: #fff3e0; color: #e67e22; }
+  .tag-completed { background: #e3f2fd; color: #2980b9; }
+  .tag-info { background: #f3e5f5; color: #8e44ad; }
+
+  .footer { text-align: center; padding: 30px; color: #999; font-size: 12px; }
+
+  @media (max-width: 600px) {
+    .header h1 { font-size: 22px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .project .top { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>GEO 招投标情报站</h1>
+  <p>GEO（生成式引擎优化）领域招标·投标·中标情报实时追踪</p>
+  <span class="badge" id="projectCount">加载中...</span>
+</div>
+
+<div class="container">
+  <div class="stats" id="stats"></div>
+
+  <div class="filters">
+    <select id="statusFilter" onchange="filterProjects()">
+      <option value="all">全部状态</option>
+      <option value="招标中">招标中</option>
+      <option value="已中标">已中标</option>
+      <option value="已成交">已成交</option>
+      <option value="情报收集">情报收集</option>
+    </select>
+    <select id="industryFilter" onchange="filterProjects()">
+      <option value="all">全部行业</option>
+    </select>
+    <input type="text" id="searchInput" placeholder="搜索企业名称或关键词..." oninput="filterProjects()">
+  </div>
+
+  <div class="update-info" id="updateInfo"></div>
+  <div id="projectList"></div>
+</div>
+
+<div class="footer">
+  <p>数据来源：中国招标投标公共服务平台、各政府采购网、企业招标平台 | 人工整理，仅供参考</p>
+  <p>如需补充或修正数据，请联系维护者</p>
+</div>
+
+<script>
+let data = null;
+
+async function loadData() {
+  try {
+    const resp = await fetch('bidding_data.json');
+    data = await resp.json();
+    render();
+  } catch(e) {
+    // Fallback: try inline data
+    document.getElementById('projectCount').textContent = '数据加载失败';
+  }
+}
+
+function statusTag(status) {
+  const map = {
+    '招标中': 'tag-bidding',
+    '已中标': 'tag-awarded',
+    '已成交': 'tag-completed',
+    '情报收集': 'tag-info'
+  };
+  return `<span class="tag ${map[status] || 'tag-info'}">${status}</span>`;
+}
+
+function renderStats() {
+  const stats = data.status_summary;
+  const cards = [
+    { label: '已中标/成交', num: (stats['已中标']||0)+(stats['已成交']||0), cls: 'green' },
+    { label: '招标中', num: stats['招标中']||0, cls: 'orange' },
+    { label: '情报收集中', num: stats['情报收集']||0, cls: 'purple' },
+    { label: '覆盖行业', num: Object.keys(data.industry_distribution).length, cls: 'blue' }
+  ];
+  document.getElementById('stats').innerHTML = cards.map(c =>
+    `<div class="stat-card ${c.cls}"><div class="num">${c.num}</div><div class="label">${c.label}</div></div>`
+  ).join('');
+  document.getElementById('projectCount').textContent = `共 ${data.projects.length} 个项目`;
+  document.getElementById('updateInfo').textContent = `最后更新：${data.meta.last_updated} | 数据来源：${data.meta.data_sources.join('、')}`;
+}
+
+function renderIndustryFilter() {
+  const sel = document.getElementById('industryFilter');
+  const industries = Object.keys(data.industry_distribution).sort();
+  sel.innerHTML = '<option value="all">全部行业</option>' +
+    industries.map(i => `<option value="${i}">${i} (${data.industry_distribution[i]})</option>`).join('');
+}
+
+function filterProjects() {
+  const status = document.getElementById('statusFilter').value;
+  const industry = document.getElementById('industryFilter').value;
+  const query = document.getElementById('searchInput').value.toLowerCase();
+
+  let filtered = data.projects.filter(p => {
+    if (status !== 'all' && p.status !== status) return false;
+    if (industry !== 'all' && p.industry !== industry) return false;
+    if (query && !p.company.toLowerCase().includes(query) && !p.title.toLowerCase().includes(query)) return false;
+    return true;
+  });
+
+  // Sort: 招标中 first, then by date desc
+  filtered.sort((a, b) => {
+    const order = { '招标中': 0, '已中标': 1, '已成交': 2, '情报收集': 3 };
+    if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
+    return (b.publish_date || '').localeCompare(a.publish_date || '');
+  });
+
+  const list = document.getElementById('projectList');
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">没有匹配的项目</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(p => `
+    <div class="project">
+      <div class="top">
+        <div>
+          <div class="company">${p.company} ${statusTag(p.status)}</div>
+          <div class="industry">${p.industry}</div>
+        </div>
+        <div class="meta">
+          ${p.budget ? `<span>💰 ${p.budget}</span>` : ''}
+          ${p.publish_date ? `<span>📅 ${p.publish_date}</span>` : ''}
+          ${p.bid_deadline ? `<span>⏰ 截止: ${p.bid_deadline}</span>` : ''}
+        </div>
+      </div>
+      <div class="title">${p.title}</div>
+      <div class="summary">${p.summary}</div>
+      ${p.winner ? `<div class="summary">🏆 中标方：${p.winner}</div>` : ''}
+      ${p.source_url ? `<div class="link"><a href="${p.source_url}" target="_blank">🔗 查看原文</a></div>` : ''}
+    </div>
+  `).join('');
+}
+
+function render() {
+  renderStats();
+  renderIndustryFilter();
+  filterProjects();
+}
+
+loadData();
+</script>
+
+</body>
+</html>
