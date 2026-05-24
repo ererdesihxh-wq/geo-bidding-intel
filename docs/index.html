@@ -670,7 +670,7 @@ function extractServicePeriod(text) {
 }
 
 function extractBiddingId(text) {
-  var m = text.match(/(?:项目|招标)[编号][号\U518a][：:]?\s*([^\s，,。\n\r]{4,30})/);
+  var m = text.match(/(?:项目|招标)[编号][号册][：:]?\s*([^\s，,。\n\r]{4,30})/);
   if (m) return m[1];
   m = text.match(/[编号][号][：:]?\s*([a-zA-Z0-9][^\s，,。\n\r]{4,30})/i);
   if (m) return m[1];
@@ -740,11 +740,232 @@ function matchExistingProjects(text, client, industry) {
   return matches.slice(0, 6);
 }
 
+/* ---- 自动情报分析引擎 ---- */
+
+function getIndustryStats(industry) {
+  if (!data || !data.projects) return null;
+  var projs = data.projects.filter(function(p) { return p.industry === industry; });
+  if (projs.length === 0) return null;
+  var total = projs.length;
+  var budgets = projs.filter(function(p) { return p._computed && p._computed.budget_wan && !isNaN(p._computed.budget_wan); });
+  var budgetWan = budgets.map(function(p) { return p._computed.budget_wan; });
+  var avgBudget = budgetWan.length > 0 ? budgetWan.reduce(function(a,b) { return a+b; }, 0) / budgetWan.length : 0;
+  var minBudget = budgetWan.length > 0 ? Math.min.apply(null, budgetWan) : 0;
+  var maxBudget = budgetWan.length > 0 ? Math.max.apply(null, budgetWan) : 0;
+  var openCount = projs.filter(function(p) { return p.status === '招标中' || p.status === '已开标'; }).length;
+  var awardedCount = projs.filter(function(p) { return p.status === '已中标' || p.status === '已成交'; }).length;
+  var winners = projs.filter(function(p) { return p.winner; });
+  var topWinners = {};
+  for (var i = 0; i < winners.length; i++) {
+    var ws = winners[i].winner.split('、');
+    for (var j = 0; j < ws.length; j++) {
+      var w = ws[j].trim();
+      if (w) topWinners[w] = (topWinners[w] || 0) + 1;
+    }
+  }
+  return {
+    count: total, avgBudget: avgBudget, minBudget: minBudget, maxBudget: maxBudget,
+    openCount: openCount, awardedCount: awardedCount, topWinners: topWinners
+  };
+}
+
+function generateIntelligence(result) {
+  var parts = [];
+  var industry = result.industry;
+  var stats = getIndustryStats(industry);
+  var budgetWan = result.raw ? parseFloat(result.raw.match(/([\d.]+)\s*万元/)?.[1]) : null;
+
+  // 行业背景
+  if (industry) {
+    parts.push('【行业背景】\n该项目属于"' + industry + '"领域。');
+    if (stats) {
+      parts.push('目前数据库中收录的同行业GEO项目共' + stats.count + '个，' +
+        '其中' + stats.awardedCount + '个已出中标结果，' +
+        (stats.avgBudget > 0 ? '平均预算约' + stats.avgBudget.toFixed(0) + '万元，' : '') +
+        '预算区间' + (stats.minBudget > 0 ? stats.minBudget.toFixed(0) + '万～' + stats.maxBudget.toFixed(0) + '万元。' : '跨度较大。'));
+      if (Object.keys(stats.topWinners).length > 0) {
+        var topList = Object.keys(stats.topWinners).sort(function(a,b) { return stats.topWinners[b] - stats.topWinners[a]; }).slice(0,3);
+        parts.push('该行业活跃供应商包括：' + topList.join('、') + '等。');
+      }
+    }
+  }
+
+  // 甲方背景
+  if (result.client) {
+    var clientInfo = '';
+    if (data && data.projects) {
+      var existing = data.projects.filter(function(p) { return p.company.indexOf(result.client) > -1 || (result.client && result.client.indexOf(p.company) > -1); });
+      if (existing.length > 0) {
+        clientInfo = '该甲方此前已有' + existing.length + '个GEO相关项目记录';
+        var prevBudgets = existing.filter(function(p) { return p._computed && p._computed.budget_wan; });
+        if (prevBudgets.length > 0) {
+          var avgPrev = prevBudgets.reduce(function(s,p) { return s + p._computed.budget_wan; }, 0) / prevBudgets.length;
+          clientInfo += '，历史平均预算约' + avgPrev.toFixed(0) + '万元';
+        }
+        clientInfo += '，表明其为GEO持续投入型客户。';
+      } else {
+        if (result.client.indexOf('华润') > -1 || result.client.indexOf('东阿') > -1 || result.client.indexOf('昆药') > -1) {
+          clientInfo = '该甲方为华润系企业。华润系已有多家下属企业（东阿阿胶、昆药集团、华润饮料等）开展GEO采购，呈现集团化、规模化推广趋势。';
+        } else if (result.client.indexOf('东风') > -1 || result.client.indexOf('本田') > -1) {
+          clientInfo = '该甲方为汽车行业头部企业。汽车行业GEO项目预算普遍较高（如东风本田1207万元），行业竞争激烈。';
+        } else if (result.client.indexOf('京东') > -1) {
+          clientInfo = '该甲方为京东系企业。京东集团已有多条业务线（京东集团公关部、京东五星电器、京东物流）独立开展GEO采购，覆盖多品牌多业务。';
+        } else if (result.client.indexOf('广汽') > -1) {
+          clientInfo = '该甲方为广汽集团旗下金融板块企业。广汽系在GEO领域布局涵盖汽车营销（东风本田）和金融租赁（广汽汇理），展现跨板块协同趋势。';
+        }
+      }
+    }
+    if (clientInfo) parts.push('\n【甲方分析】\n' + clientInfo);
+  }
+
+  // 预算分析
+  if (budgetWan && budgetWan > 0) {
+    var budgetComment = '该项目预算' + budgetWan.toFixed(0) + '万元。';
+    if (budgetWan >= 500) {
+      budgetComment += '属于超高预算项目（≥500万），在GEO行业中极为罕见，可能涉及多平台、多语种或全链路整合服务。';
+    } else if (budgetWan >= 100) {
+      budgetComment += '属于高预算项目（100万～500万），表明甲方对GEO的重视程度较高，通常要求全方位的优化服务。';
+    } else if (budgetWan >= 30) {
+      budgetComment += '属于中等预算项目（30万～100万），为GEO市场主流价位段，常见于年度框架或专项优化。';
+    } else if (budgetWan >= 10) {
+      budgetComment += '属于中小型预算项目（10万～30万），常见于单一平台优化或特定场景的GEO尝试。';
+    } else {
+      budgetComment += '属于小预算项目（<10万），多为单一来源或特定场景的试探性采购。';
+    }
+    if (stats && stats.avgBudget > 0) {
+      if (budgetWan > stats.avgBudget * 1.3) {
+        budgetComment += '显著高于同行业平均水平（' + stats.avgBudget.toFixed(0) + '万元），可能包含额外服务范围或品牌溢价。';
+      } else if (budgetWan < stats.avgBudget * 0.7) {
+        budgetComment += '低于同行业平均水平（' + stats.avgBudget.toFixed(0) + '万元），可能为单一模块采购或初期试水。';
+      } else {
+        budgetComment += '与同行业平均水平（' + stats.avgBudget.toFixed(0) + '万元）基本持平，属正常市场价位。';
+      }
+    }
+    parts.push('\n【预算分析】\n' + budgetComment);
+  } else {
+    parts.push('\n【预算分析】\n该项目预算未公开。');
+    if (stats && stats.avgBudget > 0) {
+      parts.push('参考同行业项目，平均预算约' + stats.avgBudget.toFixed(0) + '万元，区间' + stats.minBudget.toFixed(0) + '万～' + stats.maxBudget.toFixed(0) + '万元。');
+    }
+  }
+
+  // 竞争格局
+  var competitorInfo = '';
+  if (data && data.projects) {
+    var sameIndustry = data.projects.filter(function(p) { return p.industry === industry && p.id !== result.id; });
+    if (sameIndustry.length > 0) {
+      var activeOnes = sameIndustry.filter(function(p) { return p.status === '招标中' || p.status === '已开标'; });
+      if (activeOnes.length > 0) {
+        competitorInfo = '同行业目前尚有' + activeOnes.length + '个项目处于招标/开标状态，市场活跃度较高。';
+      }
+      var winnerList = sameIndustry.filter(function(p) { return p.winner; });
+      if (winnerList.length > 0) {
+        var allWinners = {};
+        for (var i = 0; i < winnerList.length; i++) {
+          var ws2 = winnerList[i].winner.split('、');
+          for (var j = 0; j < ws2.length; j++) {
+            var w2 = ws2[j].trim();
+            if (w2) allWinners[w2] = (allWinners[w2] || 0) + 1;
+          }
+        }
+        var sortedWinners = Object.keys(allWinners).sort(function(a,b) { return allWinners[b] - allWinners[a]; });
+        if (sortedWinners.length > 0) {
+          competitorInfo += '头部供应商格局：' + sortedWinners.slice(0, 5).map(function(w) { return w + '（' + allWinners[w] + '次中标）'; }).join('、') + '。';
+        }
+      }
+    }
+  }
+  if (competitorInfo) parts.push('\n【竞争格局】\n' + competitorInfo);
+
+  // 趋势研判
+  var trendInfo = '从宏观趋势看，GEO（生成式引擎优化）作为2025-2026年新兴的数字营销赛道，正处于快速爆发期。';
+  if (data && data.projects) {
+    var totalCount = data.projects.length;
+    var months = {};
+    for (var i = 0; i < data.projects.length; i++) {
+      var d = data.projects[i].publish_date;
+      if (d) {
+        var ym = d.substring(0, 7);
+        months[ym] = (months[ym] || 0) + 1;
+      }
+    }
+    var monthKeys = Object.keys(months).sort();
+    if (monthKeys.length >= 2) {
+      var firstHalf = monthKeys.slice(0, Math.floor(monthKeys.length / 2));
+      var secondHalf = monthKeys.slice(Math.floor(monthKeys.length / 2));
+      var firstSum = firstHalf.reduce(function(s, k) { return s + months[k]; }, 0);
+      var secondSum = secondHalf.reduce(function(s, k) { return s + months[k]; }, 0);
+      var firstAvg = firstSum / firstHalf.length;
+      var secondAvg = secondSum / secondHalf.length;
+      if (secondAvg > firstAvg * 1.3) {
+        trendInfo += '数据显示近半年来GEO招标项目数量加速增长（从月均' + firstAvg.toFixed(1) + '个增至' + secondAvg.toFixed(1) + '个），市场处于快速扩张期。';
+      } else {
+        trendInfo += '数据显示GEO招标项目数量保持稳定增长态势（月均约' + firstAvg.toFixed(1) + '个）。';
+      }
+    }
+  }
+  trendInfo += '行业覆盖从最初的互联网/科技、快消品扩展到金融、医药、汽车、教育、政府等十余个领域，呈现全行业渗透趋势。';
+
+  if (result.winner) {
+    trendInfo += '该项目已出中标结果，中标方为' + result.winner + '。建议关注其后续服务效果和可能的续约机会。';
+  } else if (result.deadline) {
+    var now = new Date();
+    var deadlineDate = new Date(result.deadline);
+    var daysLeft = Math.ceil((deadlineDate - now) / (1000*60*60*24));
+    if (daysLeft > 0) {
+      trendInfo += '距投标截止还有约' + daysLeft + '天，建议有意向的供应商尽快准备材料。';
+    } else {
+      trendInfo += '该项目已过投标截止日期，建议关注其后续中标公示。';
+    }
+  }
+  parts.push('\n【趋势研判】\n' + trendInfo);
+
+  // 战略建议
+  var advice = '';
+  if (industry === '金融/保险') {
+    advice = '金融行业GEO对合规要求较高（合规通过率≥95%为常见KPI），建议供应商突出合规能力、金融行业案例和数据安全保障。同时金融客户预算充足、合作周期长，是值得重点开拓的优质赛道。';
+  } else if (industry === '汽车/出行') {
+    advice = '汽车行业GEO项目普遍预算高（百万级）、要求高（多平台、多车型、多语种），且往往与SEO/品牌传播整合采购。建议供应商展现全案能力和汽车行业KOL/媒体资源。';
+  } else if (industry === '医药/健康') {
+    advice = '医药健康行业GEO需特别注意广告法合规和药品信息审核，建议供应商强化内容合规审核流程和医药行业专家资源。华润系药企集团化采购趋势明显，可作为重点客户跟进。';
+  } else if (industry === '互联网/科技') {
+    advice = '互联网/科技行业是GEO最早渗透的领域，甲方对AI技术理解深、KPI要求量化（可见度提升率、语义匹配准确度等），需要供应商具备技术驱动型服务能力。';
+  } else if (industry === '快消/食品/酒业') {
+    advice = '快消行业GEO注重品牌词和行业词的双重覆盖，且往往需要配合营销节点（新品上市、促销季）进行动态优化。建议供应商展示敏捷响应和大规模内容生产的能力。';
+  } else if (industry === '教育') {
+    advice = '教育行业GEO以招生宣传为主要目标，项目预算普遍偏低（4万～8万），但决策链短、周期快。适合作为供应商的现金流补充型项目。高职院校是教育行业GEO的主力客户。';
+  } else if (industry === '政府/公共事业') {
+    advice = '政府/公共事业GEO标志着GEO正式进入政府采购体系，具有重要的标杆意义。建议供应商提前了解政府采购流程和资质要求（如政采云登记），把握政策红利窗口。';
+  } else if (industry === '建材/家居') {
+    advice = '建材家居行业GEO需求从品牌词优化向产品词、场景词拓展。家居企业多品牌运作特点突出（如海信、东鹏），需要供应商具备多品牌管理能力。';
+  } else if (industry === '企业服务') {
+    advice = '企业服务行业GEO呈现两大趋势：一是GEO与智能获客系统结合（如浙东数字经济产业园项目），二是招标采购平台自身采购GEO服务（如易招标）。建议供应商关注GEO+SaaS的融合机会。';
+  } else if (industry === '家电/电子') {
+    advice = '家电行业GEO通常涉及多品牌、多品类、多区域的矩阵式优化，服务复杂度高。京东家电家居业务覆盖全国39城，对供应商的线下执行力有较高要求。';
+  } else {
+    advice = '建议密切关注该行业的GEO渗透率和竞争态势，提前储备行业知识和案例，以便在招标时展现专业度。';
+  }
+  parts.push('\n【战略建议】\n' + advice);
+
+  // 供应商参考
+  if (result.winner) {
+    parts.push('\n【供应商参考】\n中标方"' + result.winner + '"获得此项目。');
+    var sameWinner = data && data.projects ? data.projects.filter(function(p) { return p.winner && p.winner.indexOf(result.winner) > -1; }) : [];
+    if (sameWinner.length > 1) {
+      var winProjects = sameWinner.map(function(p) { return p.company + '(' + p.budget + ')'; }).join('、');
+      parts.push('该供应商在数据库中还有以下中标记录：' + winProjects + '。');
+    }
+  }
+
+  return parts.join('\n\n');
+}
+
 function formatAnalysisReport(result) {
   var similar = matchExistingProjects(result.raw, result.client, result.industry);
   var signalsHtml = '';
   for (var i = 0; i < result.signals.length; i++) signalsHtml += '<span class="signal-tag">' + result.signals[i] + '</span>';
 
+  var intelligence = generateIntelligence(result);
   var html = '<div class="analysis-report">';
   html += '<div class="report-header"><h3 style="margin:0 0 4px 0;font-size:16px">GEO情报分析报告</h3>';
   html += '<span style="font-size:12px;color:#999">' + result.created + ' 生成</span></div>';
@@ -766,7 +987,7 @@ function formatAnalysisReport(result) {
 
   if (similar.length > 0) {
     html += '<div class="report-section"><div class="report-section-title">📊 行业对标</div>';
-    html += '<div style="font-size:12px;color:#999;margin-bottom:8px">已收录的同行业/同类型项目：</div>';
+    html += '<div style="font-size:12px;color:#999;margin-bottom:8px">已收录的同行业/同类型项目（按匹配度排序）：</div>';
     html += '<table class="report-table"><tr><td class="rl" style="color:#666;font-size:12px">甲方</td><td class="rl" style="color:#666;font-size:12px">金额</td><td class="rl" style="color:#666;font-size:12px">状态</td><td class="rl" style="color:#666;font-size:12px">中标方</td></tr>';
     for (var i = 0; i < similar.length; i++) {
       var sp = similar[i].project;
@@ -775,8 +996,11 @@ function formatAnalysisReport(result) {
     html += '</table></div>';
   }
 
-  html += '<div class="report-section"><div class="report-section-title">💡 情报解读</div>';
-  html += '<div contenteditable="true" style="min-height:60px;padding:10px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;line-height:1.7;color:#333;background:#fafafa;outline:none" id="analysisNotes">' + (result.notes || '在此输入你的分析洞察...') + '</div></div>';
+  html += '<div class="report-section"><div class="report-section-title">📈 市场分析</div>';
+  html += '<div style="padding:12px;background:#fafafa;border-radius:8px;font-size:13px;line-height:1.9;color:#333;white-space:pre-wrap">' + intelligence + '</div></div>';
+
+  html += '<div class="report-section"><div class="report-section-title">💡 情报解读（可编辑）</div>';
+  html += '<div contenteditable="true" style="min-height:80px;padding:12px;border:1px solid #e0e0e0;border-radius:8px;font-size:13px;line-height:1.8;color:#333;background:#fafafa;outline:none" id="analysisNotes">' + (result.notes || '可在此补充你的分析洞察或根据最新信息修正上述分析...') + '</div></div>';
 
   html += '<div class="analysis-actions" style="margin-top:16px">';
   html += '<button class="btn-primary" onclick="saveAnalysis()">💾 保存记录</button>';
@@ -810,6 +1034,7 @@ function runAnalysis() {
     created: new Date().toISOString().substring(0, 10), notes: ''
   };
 
+  result._intelligence = generateIntelligence(result);
   window._lastAnalysis = result;
   document.getElementById('analysisResult').innerHTML = formatAnalysisReport(result);
 }
@@ -829,8 +1054,9 @@ function getResultFields() {
   var notesField = document.getElementById('analysisNotes');
   if (notesField) {
     var notes = notesField.textContent.trim();
-    if (notes !== '在此输入你的分析洞察...') r.notes = notes;
+    if (notes !== '可在此补充你的分析洞察或根据最新信息修正上述分析...') r.notes = notes;
   }
+  r.intelligence = r._intelligence || '';
   return r;
 }
 
@@ -854,8 +1080,9 @@ function copyAnalysisText() {
   if (r.biddingId) t += '\n招标编号：' + r.biddingId;
   if (r.servicePeriod) t += '\n服务期限：' + r.servicePeriod;
   if (r.signals && r.signals.length > 0) t += '\n\n【趋势信号】\n' + r.signals.map(function(s) { return '  ' + s; }).join('\n');
-  if (r.notes && r.notes !== '在此输入你的分析洞察...') t += '\n\n【情报解读】\n' + r.notes;
-  t += '\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n生成日期：' + (r.created || '') + ' | 来源：GEO招投标情报站\n';
+  t += '\n\n【市场分析】\n' + (r.intelligence || '') + '\n';
+  if (r.notes && r.notes !== '可在此补充你的分析洞察或根据最新信息修正上述分析...') t += '\n【情报解读】\n' + r.notes + '\n';
+  t += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n生成日期：' + (r.created || '') + ' | 来源：GEO招投标情报站\n';
   navigator.clipboard.writeText(t).then(function() { alert('报告已复制到剪贴板\n可直接粘贴到微信、飞书、邮件等'); });
 }
 
@@ -870,8 +1097,8 @@ function printAnalysis() {
   h += 'table{width:100%;border-collapse:collapse;margin:12px 0}';
   h += 'td{padding:8px 12px;border:1px solid #e0e0e0;font-size:14px}';
   h += 'td.l{background:#f5f5f5;font-weight:600;width:110px}';
-  h += '.sig{display:inline-block;padding:3px 10px;border-radius:10px;font-size:12px;margin:2px}';
-  h += '.nt{border:1px solid #e0e0e0;padding:12px;border-radius:6px;background:#fafafa;font-size:13px;line-height:1.7}';
+  h += '.sig{display:inline-block;padding:3px 10px;border-radius:10px;font-size:12px;margin:2px;background:#e3f2fd;color:#2980b9}';
+  h += '.intel{padding:12px 16px;background:#fafafa;border-radius:6px;font-size:13px;line-height:1.9;white-space:pre-wrap;border:1px solid #eee}';
   h += '.ft{text-align:center;color:#999;font-size:12px;margin-top:40px;border-top:1px solid #eee;padding-top:12px}';
   h += '@media print{body{padding:20px}}</style></head><body>';
   h += '<h1>GEO情报分析报告</h1>';
@@ -888,7 +1115,10 @@ function printAnalysis() {
     for (var i = 0; i < r.signals.length; i++) h += '<span class="sig">' + r.signals[i] + '</span> ';
     h += '</p>';
   }
-  if (r.notes && r.notes !== '在此输入你的分析洞察...') h += '<h2>情报解读</h2><div class="nt">' + r.notes.replace(/\n/g,'<br>') + '</div>';
+  h += '<h2>市场分析</h2><div class="intel">' + (r.intelligence || '暂无自动分析数据') + '</div>';
+  if (r.notes && r.notes !== '可在此补充你的分析洞察或根据最新信息修正上述分析...') {
+    h += '<h2>情报解读</h2><div class="intel" style="background:#fff">' + r.notes.replace(/\n/g,'<br>') + '</div>';
+  }
   h += '<div class="ft">生成日期：' + (r.created||'') + ' | 来源：GEO招投标情报站</div>';
   h += '<script>window.onload=function(){window.print()}<\/script></body></html>';
   w.document.write(h);
