@@ -94,19 +94,6 @@ projects = [
     "source_url": "https://www.ygbid.com/tender/20250923203620200003.html"
   },
   {
-    "id": "GEO-2025-002",
-    "company": "上海大学",
-    "industry": "教育",
-    "title": "城市体征及活力监测GEO AI数字计算系统采购意向",
-    "status": "采购意向",
-    "budget": "47.7万元",
-    "bid_deadline": "",
-    "publish_date": "2025-07-25",
-    "summary": "上海大学城市体征及活力监测GEO AI数字计算系统采购意向，预算47.7万元。属于高校在GEO+AI领域的技术基础设施采购。",
-    "winner": "",
-    "source_url": "https://bidding.shu.edu.cn/sy/xtgg_detail.jsp?wid=202507250027983857&gglx2bh=CGYX"
-  },
-  {
     "id": "GEO-2025-003",
     "company": "华润饮料（怡宝）",
     "industry": "快消/饮料",
@@ -170,7 +157,7 @@ projects = [
     "publish_date": "2026-03-10",
     "summary": "天翼云2026年官网GEO优化服务采购，第一中标候选人为北京鲲鹏伟业广告有限公司，投标报价1,065,000元（不含增值税）。招标代理为中捷通信有限公司。",
     "winner": "北京鲲鹏伟业广告有限公司",
-    "source_url": "https://mp.weixin.qq.com/s/__biz=MzYyMjEwMTExMw==&mid=2247484886&idx=1&sn=d5c59ffaf57cd31acd39c8dd93dc9d39"
+    "source_url": "https://bj.zhiliaobiaoxun.com/article/91704077"
   },
   {
     "id": "GEO-2026-005",
@@ -300,7 +287,7 @@ projects = [
     "publish_date": "2026-04-20",
     "summary": "广州白云山制药总厂系列产品官网制作搭建项目，明确包含SEO和GEO优化需求，预算35万元。官网建设+AI搜索优化一体化采购。",
     "winner": "",
-    "source_url": "https://www.yichangke.com/hetian_hyxw/410.html"
+    "source_url": "http://ygcg.gzggzy.cn/m92/fw/20260429/391578.html"
   },
   {
     "id": "GEO-2026-015",
@@ -314,19 +301,6 @@ projects = [
     "summary": "阿坝师范学院2026年招生宣传AI优化呈现服务询价采购，预算4.5万元。要求在主流AI平台（豆包、DeepSeek、文心一言等）优化招生宣传信息展示。",
     "winner": "",
     "source_url": "https://jw.abtu.edu.cn/info/1131/5141.htm"
-  },
-  {
-    "id": "GEO-2026-016",
-    "company": "台湾工业技术研究院",
-    "industry": "研究机构",
-    "title": "产业学习网GEO改善分析研究",
-    "status": "招标中",
-    "budget": "未公开",
-    "bid_deadline": "2026-05-30",
-    "publish_date": "2026-05-20",
-    "summary": "工研院就产业学习网GEO改善分析研究进行询价，要求AI搜索流量追踪、GEO改善建议、成效评估。采购编号2001802864。",
-    "winner": "",
-    "source_url": "https://quotaweb.itri.org.tw/showRFQ.aspx?rfqno=2001802864"
   },
   # ===== 新增已验证项目 =====
   {
@@ -405,7 +379,7 @@ projects = [
     "publish_date": "2026-02-12",
     "summary": "海信集团控股股份有限公司管理品牌与营销GEO项目，招标编码ZB260212034。覆盖海信、东芝电视、容声、科龙、gorenje、ASKO、vidda等多品牌。包含GEO优化（KPI：各品线AI露出率平均提升30%）、GEO智能体（全链路数字化）、GEO转化承接三大板块。",
     "winner": "",
-    "source_url": "https://mp.weixin.qq.com/s/__biz=MzYyMjEwMTExMw==&mid=2247484141&idx=1&sn=cdd82192639f8d7c22ecf4f052b84fd0"
+    "source_url": "https://shubo.365trade.com.cn/info-745080534.html"
   },
   {
     "id": "GEO-2026-023",
@@ -431,7 +405,7 @@ projects = [
     "publish_date": "2026-04-09",
     "summary": "美团2026年GEO广告采购供应商招募，合作期限2026年5月至2027年4月（年框制）。要求覆盖DeepSeek、豆包、千问、元宝、Kimi等AI平台，自研GEO优化系统语义匹配准确度≥98%，核心信息呈现率≥80%，每日每问题不少于30次监测。",
     "winner": "",
-    "source_url": "https://mp.weixin.qq.com/s/__biz=MzkzNTY1NTA4Mw==&mid=2247485017&idx=1&sn=3dc533a2c092ade96ddb29ee94d8e227"
+    "source_url": "https://shubo.365trade.com.cn/info-759134529.html"
   },
   {
     "id": "GEO-2026-025",
@@ -444,7 +418,7 @@ projects = [
     "publish_date": "2026-04-01",
     "summary": "知乎2026年商业品牌业务GEO年框供应商招募，年度预算200万元（不承诺保底）。合作周期至2027年6月30日。要求仅允许白帽GEO（优质原创、权威信源），严格禁止批量伪原创、算法攻击、恶意投喂等行为。需提供合规承诺及操作日志。",
     "winner": "",
-    "source_url": "https://mp.weixin.qq.com/s/__biz=MzYyMjEwMTExMw==&mid=2247485023&idx=1&sn=4b33ee2c81b0e3b65faeccd26ec62327"
+    "source_url": "https://gs.qianlima.com/zbcontent-586678848.html"
   },
   {
     "id": "GEO-2026-026",
@@ -470,7 +444,7 @@ projects = [
     "publish_date": "2026-04-15",
     "summary": "京东家电家居事业群（五星电器）全国GEO优化服务商招标，覆盖一二三线至少39城（京东电器、京东MALL）。需求包含品牌词/行业词/对比词AI语义优化（要求TOP3）、口碑风控（负面≤5%）、大促配合等。覆盖DeepSeek、豆包、千问、Kimi、文心一言及社媒平台。",
     "winner": "",
-    "source_url": "https://www.qianlima.com/bid-589816268.html"
+    "source_url": "https://ln.qianlima.com/zbcontent-589816268.html"
   },
   {
     "id": "GEO-2026-028",
@@ -494,9 +468,9 @@ projects = [
     "budget": "未公开",
     "bid_deadline": "2026-05-12",
     "publish_date": "2026-05-12",
-    "summary": "太平洋健康险2026年AI搜索优化服务（GEO）采购项目，已进入中标公示阶段。太平洋健康险为中国太保旗下子公司，属于保险行业GEO采购先行者之一。",
+    "summary": "太平洋健康险2026年AI搜索优化服务（GEO）采购项目，已进入中标公示阶段。太平洋健康险为中国太保旗下子公司，属于保险行业GEO采购先行者之一。注：该公告原发于招标平台，当前未找到可直接访问的原文地址。",
     "winner": "",
-    "source_url": "https://xiangmu.ibicn.com/tongxun/diqunizaijian/zhongbiao/page/10/"
+    "source_url": ""
   },
   {
     "id": "GEO-2026-030",
