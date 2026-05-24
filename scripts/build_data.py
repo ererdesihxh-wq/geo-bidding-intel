@@ -5,8 +5,29 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='repla
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# ===== 行业合并映射 =====
+INDUSTRY_MAP = {
+    "短交通/出行": "汽车/出行",
+    "快消/饮料": "快消/食品/酒业",
+    "通信/云计算": "互联网/科技",
+    "政府/旅游": "政府/公共事业",
+    "航空航天/电子": "制造业/电子",
+    "产业园区/企业服务": "企业服务",
+    "汽车": "汽车/出行",
+    "企业服务/招标": "企业服务",
+    "汽车/金融": "金融/保险",
+    "保险/金融": "金融/保险",
+    "酒业/快消": "快消/食品/酒业",
+    "食品/农业": "快消/食品/酒业",
+    "证券/金融": "金融/保险",
+    "互联网/本地生活": "互联网/科技",
+    "互联网/内容社区": "互联网/科技",
+    "互联网/电商": "互联网/科技",
+    "家电/零售": "家电/电子",
+    "物流/供应链": "企业服务",
+    "传媒/文化": "互联网/科技",
+}
 
-# ===== 数据增强函数 =====
 
 def parse_budget_wan(budget_str):
     """解析预算字符串，返回万元数值"""
@@ -20,37 +41,6 @@ def parse_budget_wan(budget_str):
     if m:
         return float(m.group(1))
     return None
-
-
-def compute_geo_relevance(project):
-    """计算GEO相关度（0-100）和等级"""
-    text = (project.get("title", "") + " " + project.get("summary", "")).lower()
-    keywords = {
-        "deepseek": 15, "豆包": 15, "文心一言": 15, "通义千问": 15,
-        "kimi": 15, "元宝": 10, "ai平台": 10, "多平台": 8,
-        "年框": 8, "kpi": 5, "语义匹配": 10, "合规": 5,
-        "露出率": 10, "监测": 5, "chatgpt": 10, "gemini": 10,
-        "ai搜索": 12, "ai优化": 12, "大模型": 10, "词条": 5,
-    }
-    score = 0
-    for kw, pts in keywords.items():
-        if kw in text:
-            score += pts
-    tier = "高" if score >= 50 else ("中" if score >= 20 else "低")
-    return {"score": min(score, 100), "tier": tier}
-
-
-def compute_priority(project):
-    """计算优先级 P0/P1/P2"""
-    budget = parse_budget_wan(project.get("budget", ""))
-    is_active = project.get("status") in ("招标中", "已开标")
-    if budget is not None and budget >= 100 and is_active:
-        return "P0"
-    if budget is not None and budget >= 30 and is_active:
-        return "P1"
-    if budget is not None and budget >= 100:
-        return "P1"
-    return "P2"
 
 
 def detect_trend_signals(project):
@@ -455,9 +445,9 @@ projects = [
     "budget": "未公开",
     "bid_deadline": "2026-01-26",
     "publish_date": "2026-01-19",
-    "summary": "京东物流国际官网SEO&GEO整合服务，合作周期1年。SEO以Google为主，GEO国内以DeepSeek、豆包为主，海外以ChatGPT、Gemini为主。要求文案团队需由英语及对应小语种母语人士组成，拒绝机器翻译。",
+    "summary": "京东物流国际官网SEO&GEO整合服务，合作周期1年。SEO以Google为主，GEO国内以DeepSeek、豆包为主，海外以ChatGPT、Gemini为主。要求文案团队需由英语及对应小语种母语人士组成，拒绝机器翻译。注：来源为微信公众号推文，原文链接无法直接访问。",
     "winner": "",
-    "source_url": "https://mp.weixin.qq.com/s/__biz=MzA5NzE1Nzg5Nw==&mid=2247486852&idx=1&sn=3bf25afbf53db6b8304dbf9bd9114867"
+    "source_url": ""
   },
   {
     "id": "GEO-2026-029",
@@ -491,10 +481,11 @@ projects = [
 enriched_projects = []
 for p in projects:
     ep = dict(p)
+    # 应用行业合并映射
+    raw_industry = ep.get("industry", "")
+    ep["industry"] = INDUSTRY_MAP.get(raw_industry, raw_industry)
     ep["_computed"] = {
         "budget_wan": parse_budget_wan(p.get("budget", "")),
-        "geo_relevance": compute_geo_relevance(p),
-        "priority": compute_priority(p),
         "signals": detect_trend_signals(p),
     }
     enriched_projects.append(ep)
@@ -503,7 +494,7 @@ data = {
   "meta": {
     "name": "GEO招投标情报站",
     "description": "GEO（生成式引擎优化）领域真实招标、投标、中标情报追踪。每个项目均来自官方招标平台或企业官网公告。",
-    "last_updated": "2026-05-23",
+    "last_updated": "2026-05-24",
     "total_projects": len(enriched_projects),
     "data_sources": [
       "华润集团守正电子招标平台",

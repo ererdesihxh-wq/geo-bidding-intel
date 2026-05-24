@@ -2,7 +2,7 @@
   "meta": {
     "name": "GEO招投标情报站",
     "description": "GEO（生成式引擎优化）领域真实招标、投标、中标情报追踪。每个项目均来自官方招标平台或企业官网公告。",
-    "last_updated": "2026-05-23",
+    "last_updated": "2026-05-24",
     "total_projects": 31,
     "data_sources": [
       "华润集团守正电子招标平台",
@@ -21,7 +21,7 @@
     {
       "id": "GEO-2025-001",
       "company": "九号公司",
-      "industry": "短交通/出行",
+      "industry": "汽车/出行",
       "title": "2025年短交通产品GEO生成式引擎优化服务供应商招标",
       "status": "已截止",
       "budget": "保证金1万元",
@@ -32,18 +32,13 @@
       "source_url": "https://www.ygbid.com/tender/20250923203620200003.html",
       "_computed": {
         "budget_wan": 1.0,
-        "geo_relevance": {
-          "score": 0,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
     {
       "id": "GEO-2025-003",
       "company": "华润饮料（怡宝）",
-      "industry": "快消/饮料",
+      "industry": "快消/食品/酒业",
       "title": "华润饮料2025-2026年企业品牌优化第三方服务项目（含GEO/SEO）",
       "status": "已截止",
       "budget": "未公开",
@@ -54,11 +49,6 @@
       "source_url": "https://www.ygbid.com/tender/20250507160004900002.html",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 5,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
@@ -76,11 +66,6 @@
       "source_url": "https://szecp.crc.com.cn/zbxx/006002/006002003/20260403/YYCJGG202603310003.html",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 10,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
@@ -98,11 +83,6 @@
       "source_url": "https://szecp.crc.com.cn/zbxx/006002/006002001/20260202/SJXYGG202602020002.html",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 12,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
@@ -120,18 +100,13 @@
       "source_url": "https://www.yangzijiang.com/Bidding/4396.html",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 17,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
     {
       "id": "GEO-2026-004",
       "company": "天翼云",
-      "industry": "通信/云计算",
+      "industry": "互联网/科技",
       "title": "2026年官网GEO优化服务采购项目",
       "status": "已中标",
       "budget": "106.5万元",
@@ -142,11 +117,6 @@
       "source_url": "https://bj.zhiliaobiaoxun.com/article/91704077",
       "_computed": {
         "budget_wan": 106.5,
-        "geo_relevance": {
-          "score": 0,
-          "tier": "低"
-        },
-        "priority": "P1",
         "signals": [
           "💰 高预算(≥100万)"
         ]
@@ -166,11 +136,6 @@
       "source_url": "https://gs.qianlima.com/zbcontent-597667495.html",
       "_computed": {
         "budget_wan": 30.0,
-        "geo_relevance": {
-          "score": 10,
-          "tier": "低"
-        },
-        "priority": "P1",
         "signals": []
       }
     },
@@ -188,18 +153,13 @@
       "source_url": "http://www.ygbid.com/tender/20260409092926900001.html",
       "_computed": {
         "budget_wan": 3.0,
-        "geo_relevance": {
-          "score": 0,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
     {
       "id": "GEO-2026-007",
       "company": "宁波市北仑区旅游发展服务中心",
-      "industry": "政府/旅游",
+      "industry": "政府/公共事业",
       "title": "梅山湾旅游度假区2026年度线上平台全矩阵运维采购",
       "status": "已开标",
       "budget": "50万元",
@@ -210,11 +170,6 @@
       "source_url": "https://zfcg.czj.ningbo.gov.cn/project/zcyNotice_view.aspx?Id=202604031716152039995385371561984",
       "_computed": {
         "budget_wan": 50.0,
-        "geo_relevance": {
-          "score": 0,
-          "tier": "低"
-        },
-        "priority": "P1",
         "signals": [
           "🏛 政府采购",
           "🎓 公共采购"
@@ -224,7 +179,7 @@
     {
       "id": "GEO-2026-008",
       "company": "中航电测仪器（西安）有限公司",
-      "industry": "航空航天/电子",
+      "industry": "制造业/电子",
       "title": "GEO生成式引擎优化询价采购",
       "status": "招标中",
       "budget": "未公开",
@@ -235,11 +190,6 @@
       "source_url": "http://www.yfbzb.com/inviteBid/detail/20260513_596834322.html",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 0,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
@@ -257,11 +207,6 @@
       "source_url": "https://www.hejuncollege.com/tzgg/14378.html",
       "_computed": {
         "budget_wan": 8.0,
-        "geo_relevance": {
-          "score": 72,
-          "tier": "高"
-        },
-        "priority": "P2",
         "signals": [
           "🎓 公共采购"
         ]
@@ -281,11 +226,6 @@
       "source_url": "http://www.yfbzb.com/inviteBid/detail/20260522_599259155.html",
       "_computed": {
         "budget_wan": 4.0,
-        "geo_relevance": {
-          "score": 100,
-          "tier": "高"
-        },
-        "priority": "P2",
         "signals": [
           "🎓 公共采购"
         ]
@@ -294,7 +234,7 @@
     {
       "id": "GEO-2026-011",
       "company": "浙东数字经济产业园运营中心",
-      "industry": "产业园区/企业服务",
+      "industry": "企业服务",
       "title": "GEO优化智能获客系统采购项目",
       "status": "已中标",
       "budget": "68.9万元",
@@ -305,11 +245,6 @@
       "source_url": "http://www.zgggzy.com/jieguo/show.php?itemid=100000",
       "_computed": {
         "budget_wan": 68.9,
-        "geo_relevance": {
-          "score": 0,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": [
           "🤖 AI智能体"
         ]
@@ -318,7 +253,7 @@
     {
       "id": "GEO-2026-012",
       "company": "奇瑞汽车",
-      "industry": "汽车",
+      "industry": "汽车/出行",
       "title": "2025年奇瑞营销产品SEO、GEO优化代理招标项目",
       "status": "已截止",
       "budget": "未公开",
@@ -329,18 +264,13 @@
       "source_url": "https://ebd.mychery.com/en/zd20=jsgcbg/20260310/1216064709006983168.html",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 0,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
     {
       "id": "GEO-2026-013",
       "company": "易招标（招采进宝）",
-      "industry": "企业服务/招标",
+      "industry": "企业服务",
       "title": "GEO优化服务采购项目",
       "status": "已中标",
       "budget": "含激励机制",
@@ -351,11 +281,6 @@
       "source_url": "https://china.zcjb.com.cn/cms/china/webfile/detail/index.html?contentId=1229839006590566400",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 0,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
@@ -373,11 +298,6 @@
       "source_url": "http://ygcg.gzggzy.cn/m92/fw/20260429/391578.html",
       "_computed": {
         "budget_wan": 35.0,
-        "geo_relevance": {
-          "score": 12,
-          "tier": "低"
-        },
-        "priority": "P1",
         "signals": []
       }
     },
@@ -395,11 +315,6 @@
       "source_url": "https://jw.abtu.edu.cn/info/1131/5141.htm",
       "_computed": {
         "budget_wan": 4.5,
-        "geo_relevance": {
-          "score": 67,
-          "tier": "高"
-        },
-        "priority": "P2",
         "signals": [
           "🎓 公共采购"
         ]
@@ -408,7 +323,7 @@
     {
       "id": "GEO-2026-017",
       "company": "东风本田",
-      "industry": "汽车",
+      "industry": "汽车/出行",
       "title": "东风Honda 2026年GEO项目（生成式引擎优化）",
       "status": "已中标",
       "budget": "1207万元",
@@ -419,11 +334,6 @@
       "source_url": "https://www.bidchance.com/info-zhongbiao-95693f7b5995c646dd4ce3fffed20dbc.html",
       "_computed": {
         "budget_wan": 1207.0,
-        "geo_relevance": {
-          "score": 95,
-          "tier": "高"
-        },
-        "priority": "P1",
         "signals": [
           "💰 高预算(≥100万)"
         ]
@@ -432,7 +342,7 @@
     {
       "id": "GEO-2026-018",
       "company": "广汽汇理租赁",
-      "industry": "汽车/金融",
+      "industry": "金融/保险",
       "title": "广汽汇理租赁品牌公关传播及GEO服务项目",
       "status": "已中标",
       "budget": "180万元",
@@ -443,11 +353,6 @@
       "source_url": "https://ygcg.gzggzy.cn/p92/fw3/20260507/393930.html",
       "_computed": {
         "budget_wan": 180.0,
-        "geo_relevance": {
-          "score": 0,
-          "tier": "低"
-        },
-        "priority": "P1",
         "signals": [
           "🏦 金融行业",
           "💰 高预算(≥100万)"
@@ -457,7 +362,7 @@
     {
       "id": "GEO-2026-019",
       "company": "中英人寿",
-      "industry": "保险/金融",
+      "industry": "金融/保险",
       "title": "2026年中英人寿GEO（AI搜索引擎优化）项目",
       "status": "已中标",
       "budget": "未公开",
@@ -468,11 +373,6 @@
       "source_url": "https://beijing.zhaobiao.cn/succeed_v_02ff8ee34ccd4f7874f6b9ca1691768d.html",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 12,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": [
           "🏦 金融行业"
         ]
@@ -481,7 +381,7 @@
     {
       "id": "GEO-2026-020",
       "company": "五粮液",
-      "industry": "酒业/快消",
+      "industry": "快消/食品/酒业",
       "title": "AI平台内容优化项目（GEO生成式引擎优化）",
       "status": "已截止",
       "budget": "未公开",
@@ -492,18 +392,13 @@
       "source_url": "https://www.chinabidding.cn/zbgg/U-vzwzYjW.html",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 50,
-          "tier": "高"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
     {
       "id": "GEO-2026-021",
       "company": "中粮肉食",
-      "industry": "食品/农业",
+      "industry": "快消/食品/酒业",
       "title": "2026年口碑舆情监测及SEO、GEO优化项目",
       "status": "已截止",
       "budget": "95万元",
@@ -514,11 +409,6 @@
       "source_url": "https://www.gc-zb.com.cn/markinfo/rMvvI1XXC9KPUT-b65U..A.html",
       "_computed": {
         "budget_wan": 95.0,
-        "geo_relevance": {
-          "score": 5,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
@@ -536,11 +426,6 @@
       "source_url": "https://shubo.365trade.com.cn/info-745080534.html",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 15,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": [
           "🏢 多品牌覆盖",
           "🤖 AI智能体"
@@ -550,7 +435,7 @@
     {
       "id": "GEO-2026-023",
       "company": "中信建投证券",
-      "industry": "证券/金融",
+      "industry": "金融/保险",
       "title": "GEO优化项目供应商征集",
       "status": "已截止",
       "budget": "未公开",
@@ -561,11 +446,6 @@
       "source_url": "https://www.ygbid.com/tender/20260129165703900034.html",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 25,
-          "tier": "中"
-        },
-        "priority": "P2",
         "signals": [
           "🏦 金融行业"
         ]
@@ -574,7 +454,7 @@
     {
       "id": "GEO-2026-024",
       "company": "美团",
-      "industry": "互联网/本地生活",
+      "industry": "互联网/科技",
       "title": "2026年美团GEO广告采购供应商招募",
       "status": "已截止",
       "budget": "约1000万元",
@@ -585,11 +465,6 @@
       "source_url": "https://shubo.365trade.com.cn/info-759134529.html",
       "_computed": {
         "budget_wan": 1000.0,
-        "geo_relevance": {
-          "score": 88,
-          "tier": "高"
-        },
-        "priority": "P1",
         "signals": [
           "📅 年框制",
           "💰 高预算(≥100万)"
@@ -599,7 +474,7 @@
     {
       "id": "GEO-2026-025",
       "company": "知乎",
-      "industry": "互联网/内容社区",
+      "industry": "互联网/科技",
       "title": "2026年知乎商业品牌业务GEO年框供应商招募",
       "status": "已截止",
       "budget": "200万元",
@@ -610,11 +485,6 @@
       "source_url": "https://gs.qianlima.com/zbcontent-586678848.html",
       "_computed": {
         "budget_wan": 200.0,
-        "geo_relevance": {
-          "score": 13,
-          "tier": "低"
-        },
-        "priority": "P1",
         "signals": [
           "📅 年框制",
           "💰 高预算(≥100万)"
@@ -624,7 +494,7 @@
     {
       "id": "GEO-2026-026",
       "company": "京东集团",
-      "industry": "互联网/电商",
+      "industry": "互联网/科技",
       "title": "京东集团CCO体系-公共关系部-GEO项目",
       "status": "已截止",
       "budget": "未公开",
@@ -635,18 +505,13 @@
       "source_url": "http://m.ai8.com.cn/n-zb-64833468.html",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 77,
-          "tier": "高"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
     {
       "id": "GEO-2026-027",
       "company": "京东五星电器",
-      "industry": "家电/零售",
+      "industry": "家电/电子",
       "title": "京东2026-家电家居事业群（五星）全国GEO优化服务商招标",
       "status": "已截止",
       "budget": "未公开",
@@ -657,33 +522,23 @@
       "source_url": "https://ln.qianlima.com/zbcontent-589816268.html",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 60,
-          "tier": "高"
-        },
-        "priority": "P2",
         "signals": []
       }
     },
     {
       "id": "GEO-2026-028",
       "company": "京东物流",
-      "industry": "物流/供应链",
+      "industry": "企业服务",
       "title": "京东物流国际官网SEO&GEO服务商招标项目",
       "status": "已截止",
       "budget": "未公开",
       "bid_deadline": "2026-01-26",
       "publish_date": "2026-01-19",
-      "summary": "京东物流国际官网SEO&GEO整合服务，合作周期1年。SEO以Google为主，GEO国内以DeepSeek、豆包为主，海外以ChatGPT、Gemini为主。要求文案团队需由英语及对应小语种母语人士组成，拒绝机器翻译。",
+      "summary": "京东物流国际官网SEO&GEO整合服务，合作周期1年。SEO以Google为主，GEO国内以DeepSeek、豆包为主，海外以ChatGPT、Gemini为主。要求文案团队需由英语及对应小语种母语人士组成，拒绝机器翻译。注：来源为微信公众号推文，原文链接无法直接访问。",
       "winner": "",
-      "source_url": "https://mp.weixin.qq.com/s/__biz=MzA5NzE1Nzg5Nw==&mid=2247486852&idx=1&sn=3bf25afbf53db6b8304dbf9bd9114867",
+      "source_url": "",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 50,
-          "tier": "高"
-        },
-        "priority": "P2",
         "signals": [
           "🌐 国际GEO"
         ]
@@ -692,7 +547,7 @@
     {
       "id": "GEO-2026-029",
       "company": "太平洋健康险",
-      "industry": "保险/金融",
+      "industry": "金融/保险",
       "title": "太平洋健康险2026年AI搜索优化服务（GEO）采购",
       "status": "已中标",
       "budget": "未公开",
@@ -703,11 +558,6 @@
       "source_url": "",
       "_computed": {
         "budget_wan": null,
-        "geo_relevance": {
-          "score": 12,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": [
           "🏦 金融行业"
         ]
@@ -716,7 +566,7 @@
     {
       "id": "GEO-2026-030",
       "company": "四川广电传媒",
-      "industry": "传媒/文化",
+      "industry": "互联网/科技",
       "title": "GEO系统技术支持服务采购项目",
       "status": "已截止",
       "budget": "15万元",
@@ -727,11 +577,6 @@
       "source_url": "http://www.sctv.com/announcement/2037447329052442625",
       "_computed": {
         "budget_wan": 15.0,
-        "geo_relevance": {
-          "score": 0,
-          "tier": "低"
-        },
-        "priority": "P2",
         "signals": []
       }
     }
@@ -744,28 +589,16 @@
     "已成交": 1
   },
   "industry_distribution": {
-    "短交通/出行": 1,
-    "快消/饮料": 1,
+    "汽车/出行": 3,
+    "快消/食品/酒业": 3,
     "医药/健康": 4,
-    "通信/云计算": 1,
+    "互联网/科技": 5,
     "建材/家居": 2,
-    "政府/旅游": 1,
-    "航空航天/电子": 1,
+    "政府/公共事业": 1,
+    "制造业/电子": 1,
     "教育": 3,
-    "产业园区/企业服务": 1,
-    "汽车": 2,
-    "企业服务/招标": 1,
-    "汽车/金融": 1,
-    "保险/金融": 2,
-    "酒业/快消": 1,
-    "食品/农业": 1,
-    "家电/电子": 1,
-    "证券/金融": 1,
-    "互联网/本地生活": 1,
-    "互联网/内容社区": 1,
-    "互联网/电商": 1,
-    "家电/零售": 1,
-    "物流/供应链": 1,
-    "传媒/文化": 1
+    "企业服务": 3,
+    "金融/保险": 4,
+    "家电/电子": 2
   }
 }
