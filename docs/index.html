@@ -215,7 +215,13 @@
   <div class="analysis-layout">
     <div class="analysis-card">
       <h3>✏️ 输入招标信息</h3>
-      <textarea id="analysisInput" rows="10" placeholder="粘贴招标公告文本...&#10;&#10;示例：&#10;项目名称：东风Honda 2026年GEO项目&#10;采购人：东风本田汽车有限公司&#10;预算金额：1207万元&#10;投标截止时间：2025年3月16日&#10;项目需求：在DeepSeek、Kimi等AI平台进行车型推荐优化"></textarea>
+      <textarea id="analysisInput" rows="10" placeholder="粘贴招标公告文本...">项目名称：广汽汇理租赁品牌公关传播及GEO服务项目
+采购方：广州广汽汇理融资租赁有限公司
+采购控制价：180万元
+投标截止时间：2026年4月30日
+服务期限：两年
+项目内容：品牌公关传播及GEO优化服务
+需求：在主流AI平台进行品牌形象优化与公关传播</textarea>
       <div class="analysis-actions">
         <button class="btn-primary" onclick="runAnalysis()">开始分析</button>
         <button class="btn-secondary" onclick="clearAnalysis()">清空</button>
@@ -249,6 +255,8 @@ var INLINE_DATA = {"meta": {"name": "GEO招投标情报站", "description": "GEO
 var data = null;
 
 // ===== Tab Switching =====
+var _analysisRan = false;
+
 function switchTab(name) {
   document.querySelectorAll('.tab-pane').forEach(function(el) { el.classList.remove('active'); });
   document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
@@ -256,7 +264,13 @@ function switchTab(name) {
   document.querySelector('.tab-btn[onclick*="' + name + '"]').classList.add('active');
   location.hash = name;
   if (name === 'trends' && data) renderTrends();
-  if (name === 'analysis' && data) renderAnalysisHistory();
+  if (name === 'analysis' && data) {
+    renderAnalysisHistory();
+    if (!_analysisRan) {
+      _analysisRan = true;
+      setTimeout(function() { runAnalysis(); }, 100);
+    }
+  }
 }
 
 // ===== Data Enrichment =====
@@ -759,8 +773,8 @@ function matchExistingProjects(text, client, industry) {
     var p = data.projects[i];
     var score = 0;
     // direct name match (strongest signal)
-    if (client && p.company.indexOf(client) > -1) { score += 20; }
-    else if (client && client.indexOf(p.company) > -1) { score += 15; }
+    if (client && p.company.indexOf(client) > -1) { score += 15; }
+    else if (client && client.indexOf(p.company) > -1) { score += 12; }
     else {
       // partial name match: check if any 2+ chars of client appear in p.company
       var shared = 0;
@@ -768,13 +782,11 @@ function matchExistingProjects(text, client, industry) {
         for (var ci = 0; ci < client.length - 1; ci++) {
           if (p.company.indexOf(client[ci]) > -1) shared++;
         }
-        if (shared >= 2) score += shared;
+        if (shared >= 3) score += Math.min(shared, 8);
       }
     }
-    // industry match (only counts if there's already a name signal)
-    if (industry && p.industry === industry && score > 0) score += 6;
-    // same industry without name match = low score
-    else if (industry && p.industry === industry) score += 2;
+    // same industry = strong signal regardless
+    if (industry && p.industry === industry) score += 5;
     // budget range closeness
     var inputBudget = parseFloat((text || '').match(/([\d.]+)\s*万元/)?.[1]);
     var pBudget = p._computed && p._computed.budget_wan;
@@ -783,10 +795,10 @@ function matchExistingProjects(text, client, industry) {
       if (ratio > 0.5) score += 3;
     }
 
-    if (score >= 7) matches.push({ project: p, score: score });
+    if (score >= 5) matches.push({ project: p, score: score });
   }
   matches.sort(function(a, b) { return b.score - a.score; });
-  return matches.slice(0, 6);
+  return matches.slice(0, 8);
 }
 
 /* ---- 自动情报分析引擎 ---- */
@@ -1089,8 +1101,9 @@ function runAnalysis() {
 }
 
 function clearAnalysis() {
-  document.getElementById('analysisInput').value = '';
+  document.getElementById('analysisInput').value = '项目名称：广汽汇理租赁品牌公关传播及GEO服务项目\n采购方：广州广汽汇理融资租赁有限公司\n采购控制价：180万元\n投标截止时间：2026年4月30日\n服务期限：两年\n项目内容：品牌公关传播及GEO优化服务\n需求：在主流AI平台进行品牌形象优化与公关传播';
   document.getElementById('analysisResult').innerHTML = '<div class="analysis-empty"><p>输入招标信息后点击"开始分析"</p></div>';
+  _analysisRan = false;
 }
 
 function getResultFields() {
@@ -1138,9 +1151,11 @@ function copyAnalysisText() {
 function printAnalysis() {
   var r = getResultFields();
   if (!r) return;
+  var fileName = (r.client || 'GEO') + '_GEO情报分析报告';
   var w = window.open('', '_blank');
-  var h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>GEO情报分析报告</title>';
+  var h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + fileName + '</title>';
   h += '<style>body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;padding:40px;color:#333;line-height:1.8}';
+  h += '@page{size:A4;margin:2cm}';
   h += 'h1{font-size:22px;text-align:center;border-bottom:2px solid #302b63;padding-bottom:12px;margin-bottom:20px}';
   h += 'h2{font-size:16px;color:#302b63;margin:20px 0 10px;padding-left:10px;border-left:3px solid #302b63}';
   h += 'table{width:100%;border-collapse:collapse;margin:12px 0}';
