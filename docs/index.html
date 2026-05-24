@@ -215,7 +215,7 @@
   <div class="analysis-layout">
     <div class="analysis-card">
       <h3>✏️ 输入招标信息</h3>
-      <textarea id="analysisInput" rows="10" placeholder="粘贴招标公告文本或URL...&#10;&#10;示例：&#10;项目名称：东风Honda 2026年GEO项目&#10;采购人：东风本田汽车有限公司&#10;预算金额：1207万元&#10;投标截止时间：2025年3月16日&#10;项目需求：在DeepSeek、Kimi等AI平台进行车型推荐优化"></textarea>
+      <textarea id="analysisInput" rows="10" placeholder="粘贴招标公告文本...&#10;&#10;示例：&#10;项目名称：东风Honda 2026年GEO项目&#10;采购人：东风本田汽车有限公司&#10;预算金额：1207万元&#10;投标截止时间：2025年3月16日&#10;项目需求：在DeepSeek、Kimi等AI平台进行车型推荐优化"></textarea>
       <div class="analysis-actions">
         <button class="btn-primary" onclick="runAnalysis()">开始分析</button>
         <button class="btn-secondary" onclick="clearAnalysis()">清空</button>
@@ -613,28 +613,42 @@ function renderTrends() {
 
 // ===== Analysis Tab - Enhanced =====
 function extractClient(text) {
-  var patterns = [/招标[人方][：:]?\s*([^\s，,。\n\r]+)/, /采购[人方][：:]?\s*([^\s，,。\n\r]+)/, /业主[：:]?\s*([^\s，,。\n\r]+)/, /甲方[：:]?\s*([^\s，,。\n\r]+)/, /成交[人方][：:]?\s*([^\s，,。\n\r]+)/, /中标[人方][：:]?\s*([^\s，,。\n\r]+)/];
+  var patterns = [
+    /采购[人方单位][：:]?\s*([^\s，,。\n\r]{2,30})/,
+    /招标[人方][：:]?\s*([^\s，,。\n\r]{2,30})/,
+    /业主[：:]?\s*([^\s，,。\n\r]{2,30})/,
+    /甲方[：:]?\s*([^\s，,。\n\r]{2,30})/,
+    /成交[人方][：:]?\s*([^\s，,。\n\r]{2,30})/,
+    /中标[人方][：:]?\s*([^\s，,。\n\r]{2,30})/
+  ];
   for (var i = 0; i < patterns.length; i++) {
     var m = text.match(patterns[i]);
-    if (m && m[1].length > 1) return m[1].replace(/（.*）/, '');
+    if (m) {
+      var name = m[1].replace(/（[^）]*）/g, '').trim();
+      if (name.length >= 2 && name.length <= 25) return name;
+    }
   }
   return '';
 }
 
 function extractBudget(text) {
-  var m = text.match(/([\d.]+)\s*万元/);
-  if (m) return m[0];
-  m = text.match(/预算[：:]?\s*([^\s，,。\n\r]+)/);
+  var m = text.match(/(?:预算|采购控制价|最高限价|项目金额)[^\d]*?([\d.]+)\s*万/);
+  if (m) return m[1] + '万元';
+  m = text.match(/约?\s*([\d.]+)\s*万元/);
+  if (m) return m[1] + '万元';
+  m = text.match(/([\d,]+)\s*万元/);
+  if (m) return m[1].replace(/,/g, '') + '万元';
+  m = text.match(/中标[金额][额]?[：:]?\s*([^\s，,。\n\r]{2,20})/);
   if (m) return m[1];
-  m = text.match(/中标[金额][额骝][：:]?\s*([^\s，,。\n\r]+)/);
+  m = text.match(/预算[：:]?\s*([^\s，,。\n\r]{2,20})/);
   if (m) return m[1];
-  m = text.match(/([\d.]+)\s*万[元元]/);
-  if (m) return m[0];
   return '';
 }
 
 function extractDeadline(text) {
-  var m = text.match(/截止[^：:]*[：:]?\s*(\d{4}[-年]\d{1,2}[-月]\d{1,2})/);
+  var m = text.match(/(?:投标|递交|应答)[^：:]*截止[^：:]*[：:]?\s*(\d{4}[-年]\d{1,2}[-月]\d{1,2})/);
+  if (m) return m[1].replace('年','-').replace('月','-');
+  m = text.match(/截止[^：:]*[：:]?\s*(\d{4}[-年]\d{1,2}[-月]\d{1,2})/);
   if (m) return m[1].replace('年','-').replace('月','-');
   m = text.match(/(\d{4}[-年]\d{1,2}[-月]\d{1,2})\s*[前截]/);
   if (m) return m[1].replace('年','-').replace('月','-');
@@ -642,12 +656,30 @@ function extractDeadline(text) {
 }
 
 function extractTitle(text) {
-  var m = text.match(/项目名[称][：:]?\s*([^\n\r]+)/);
+  var m = text.match(/项目名[称][：:]?\s*([^\n\r]{4,60})/);
+  if (m) return m[1].trim();
+  m = text.match(/采购[名称][：:]?\s*([^\n\r]{4,60})/);
+  if (m) return m[1].trim();
+  m = text.match(/招标[名称]?[：:]?\s*([^\n\r]{4,60})/);
   if (m) return m[1].trim();
   var lines = text.split('\n');
   for (var i = 0; i < lines.length; i++) {
     var l = lines[i].trim();
-    if (l.indexOf('项目') > -1 && l.length < 60 && l.length > 4) return l;
+    if (l.indexOf('项目名') > -1) {
+      var parts = l.split(/[：:]\s*/);
+      if (parts.length > 1 && parts[1].length >= 4 && parts[1].length <= 60) return parts[1].trim();
+    }
+  }
+  for (var i = 0; i < lines.length; i++) {
+    var l = lines[i].trim();
+    if (l.indexOf('项目') > -1 && l.indexOf('GEO') > -1 && l.length < 70 && l.length > 4) return l;
+  }
+  for (var i = 0; i < lines.length; i++) {
+    var l = lines[i].trim();
+    if (l.indexOf('项目') > -1 && l.length > 4 && l.length < 60 && l.indexOf('/') < 0) {
+      if (l.match(/[。，、]/)) continue;
+      return l;
+    }
   }
   return '';
 }
@@ -678,19 +710,19 @@ function extractBiddingId(text) {
 }
 
 var ANALYSIS_INDUSTRY_KW = {
-  '汽车': '汽车/出行', '出行': '汽车/出行', '本田': '汽车/出行', '丰田': '汽车/出行', '奇瑞': '汽车/出行',
-  '金融': '金融/保险', '保险': '金融/保险', '证券': '金融/保险', '银行': '金融/保险',
-  '医药': '医药/健康', '健康': '医药/健康', '药': '医药/健康', '医疗': '医药/健康',
-  '互联网': '互联网/科技', '科技': '互联网/科技', '软件': '互联网/科技', 'AI': '互联网/科技', '智能': '互联网/科技',
-  '教育': '教育', '学院': '教育', '大学': '教育', '职业': '教育', '学校': '教育',
-  '食品': '快消/食品/酒业', '酒': '快消/食品/酒业', '饮料': '快消/食品/酒业',
+  '汽车': '汽车/出行', '出行': '汽车/出行', '本田': '汽车/出行', '丰田': '汽车/出行', '奇瑞': '汽车/出行', '东风': '汽车/出行',
+  '金融': '金融/保险', '保险': '金融/保险', '证券': '金融/保险', '银行': '金融/保险', '人寿': '金融/保险', '融资租赁': '金融/保险',
+  '医药': '医药/健康', '健康': '医药/健康', '药': '医药/健康', '医疗': '医药/健康', '阿胶': '医药/健康',
+  '互联网': '互联网/科技', '科技': '互联网/科技', '软件': '互联网/科技', 'AI': '互联网/科技', '智能': '互联网/科技', '传媒': '互联网/科技', '广电': '互联网/科技', '知乎': '互联网/科技', '美团': '互联网/科技',
+  '教育': '教育', '学院': '教育', '大学': '教育', '职业': '教育', '学校': '教育', '招生': '教育',
+  '食品': '快消/食品/酒业', '酒': '快消/食品/酒业', '饮料': '快消/食品/酒业', '五粮液': '快消/食品/酒业', '肉食': '快消/食品/酒业',
   '家电': '家电/电子', '电子': '家电/电子', '电器': '家电/电子', '海信': '家电/电子',
-  '建材': '建材/家居', '家居': '建材/家居', '瓷砖': '建材/家居', '装修': '建材/家居',
-  '政府': '政府/公共事业', '政务': '政府/公共事业', '公共': '政府/公共事业',
-  '制造': '制造业/电子', '航空': '制造业/电子', '航天': '制造业/电子',
-  '企业服务': '企业服务', '咨询': '企业服务', 'SaaS': '企业服务', '招标': '企业服务',
-  '传媒': '互联网/科技', '广电': '互联网/科技', '文化': '互联网/科技',
+  '建材': '建材/家居', '家居': '建材/家居', '瓷砖': '建材/家居', '冠珠': '建材/家居', '东鹏': '建材/家居',
+  '政府': '政府/公共事业', '政务': '政府/公共事业', '公共': '政府/公共事业', '旅游': '政府/公共事业', '度假区': '政府/公共事业',
+  '制造': '制造业/电子', '航空': '制造业/电子', '航天': '制造业/电子', '中航': '制造业/电子',
+  '企业服务': '企业服务', '咨询': '企业服务', 'SaaS': '企业服务',
   '物流': '企业服务', '供应链': '企业服务', '快递': '企业服务',
+  '京东': '互联网/科技', '五星': '家电/电子',
 };
 
 function detectIndustry(text, clientName) {
@@ -700,9 +732,9 @@ function detectIndustry(text, clientName) {
     var score = 0;
     if (combined.indexOf(kw) > -1) {
       score = kw.length * 2;
-      if (clientName && clientName.indexOf(kw) > -1) score += 20;
-      if (score > bestScore) { bestScore = score; best = ANALYSIS_INDUSTRY_KW[kw]; }
+      if (clientName && clientName.indexOf(kw) > -1) score += 30;
     }
+    if (score > bestScore) { bestScore = score; best = ANALYSIS_INDUSTRY_KW[kw]; }
   }
   return best || '待确认';
 }
@@ -726,15 +758,32 @@ function matchExistingProjects(text, client, industry) {
   for (var i = 0; i < data.projects.length; i++) {
     var p = data.projects[i];
     var score = 0;
-    if (client && p.company.indexOf(client) > -1) score += 10;
-    if (client && client.indexOf(p.company) > -1) score += 8;
-    if (industry && p.industry === industry) score += 5;
-    if (text && p.company.split('')[0] && text.indexOf(p.company.split('')[0]) > -1) {
-      for (var ci = 0; ci < p.company.length - 1; ci++) {
-        if (text.indexOf(p.company[ci]) > -1) { score += 2; break; }
+    // direct name match (strongest signal)
+    if (client && p.company.indexOf(client) > -1) { score += 20; }
+    else if (client && client.indexOf(p.company) > -1) { score += 15; }
+    else {
+      // partial name match: check if any 2+ chars of client appear in p.company
+      var shared = 0;
+      if (client) {
+        for (var ci = 0; ci < client.length - 1; ci++) {
+          if (p.company.indexOf(client[ci]) > -1) shared++;
+        }
+        if (shared >= 2) score += shared;
       }
     }
-    if (score >= 4) matches.push({ project: p, score: score });
+    // industry match (only counts if there's already a name signal)
+    if (industry && p.industry === industry && score > 0) score += 6;
+    // same industry without name match = low score
+    else if (industry && p.industry === industry) score += 2;
+    // budget range closeness
+    var inputBudget = parseFloat((text || '').match(/([\d.]+)\s*万元/)?.[1]);
+    var pBudget = p._computed && p._computed.budget_wan;
+    if (inputBudget && pBudget && !isNaN(inputBudget) && !isNaN(pBudget)) {
+      var ratio = Math.min(inputBudget, pBudget) / Math.max(inputBudget, pBudget);
+      if (ratio > 0.5) score += 3;
+    }
+
+    if (score >= 7) matches.push({ project: p, score: score });
   }
   matches.sort(function(a, b) { return b.score - a.score; });
   return matches.slice(0, 6);
