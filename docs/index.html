@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GEO招投标情报站</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f7fa; color: #1a1a2e; line-height: 1.6; }
@@ -728,7 +729,7 @@ var ANALYSIS_INDUSTRY_KW = {
   '金融': '金融/保险', '保险': '金融/保险', '证券': '金融/保险', '银行': '金融/保险', '人寿': '金融/保险', '融资租赁': '金融/保险',
   '医药': '医药/健康', '健康': '医药/健康', '药': '医药/健康', '医疗': '医药/健康', '阿胶': '医药/健康',
   '互联网': '互联网/科技', '科技': '互联网/科技', '软件': '互联网/科技', 'AI': '互联网/科技', '智能': '互联网/科技', '传媒': '互联网/科技', '广电': '互联网/科技', '知乎': '互联网/科技', '美团': '互联网/科技',
-  '教育': '教育', '学院': '教育', '大学': '教育', '职业': '教育', '学校': '教育', '招生': '教育',
+  '教育': '教育', '学院': '教育', '大学': '教育', '职业': '教育', '学校': '教育', '招生': '教育', '科技学院': '教育', '科技大学': '教育', '理工学院': '教育', '职业学院': '教育', '师范大学': '教育',
   '食品': '快消/食品/酒业', '酒': '快消/食品/酒业', '饮料': '快消/食品/酒业', '五粮液': '快消/食品/酒业', '肉食': '快消/食品/酒业',
   '家电': '家电/电子', '电子': '家电/电子', '电器': '家电/电子', '海信': '家电/电子',
   '建材': '建材/家居', '家居': '建材/家居', '瓷砖': '建材/家居', '冠珠': '建材/家居', '东鹏': '建材/家居',
@@ -1066,7 +1067,7 @@ function formatAnalysisReport(result) {
   html += '<div class="analysis-actions" style="margin-top:16px">';
   html += '<button class="btn-primary" onclick="saveAnalysis()">💾 保存记录</button>';
   html += '<button class="btn-secondary" onclick="copyAnalysisText()">📋 复制报告</button>';
-  html += '<button class="btn-secondary" onclick="printAnalysis()">🖨️ 导出PDF</button>';
+  html += '<button class="btn-secondary" onclick="downloadPdf()">📥 下载PDF</button>';
   html += '</div></div>';
 
   return html;
@@ -1101,9 +1102,8 @@ function runAnalysis() {
 }
 
 function clearAnalysis() {
-  document.getElementById('analysisInput').value = '项目名称：广汽汇理租赁品牌公关传播及GEO服务项目\n采购方：广州广汽汇理融资租赁有限公司\n采购控制价：180万元\n投标截止时间：2026年4月30日\n服务期限：两年\n项目内容：品牌公关传播及GEO优化服务\n需求：在主流AI平台进行品牌形象优化与公关传播';
+  document.getElementById('analysisInput').value = '';
   document.getElementById('analysisResult').innerHTML = '<div class="analysis-empty"><p>输入招标信息后点击"开始分析"</p></div>';
-  _analysisRan = false;
 }
 
 function getResultFields() {
@@ -1187,6 +1187,62 @@ function printAnalysis() {
   h += '<script>window.onload=function(){window.print()}<\/script></body></html>';
   w.document.write(h);
   w.document.close();
+}
+
+function downloadPdf() {
+  var r = getResultFields();
+  if (!r) return;
+  var btn = event && event.target ? event.target : document.querySelector('.analysis-actions .btn-secondary:last-child');
+  var origText = btn ? btn.textContent : '';
+  if (btn) btn.textContent = '⏳ 生成中...';
+  var container = document.createElement('div');
+  container.style.cssText = 'width:800px;padding:40px;font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#333;line-height:1.8;background:#fff';
+  container.innerHTML = '<h1 style="font-size:22px;text-align:center;border-bottom:2px solid #302b63;padding-bottom:12px;margin-bottom:20px">GEO情报分析报告</h1>';
+  container.innerHTML += '<table style="width:100%;border-collapse:collapse;margin:12px 0">';
+  var fields = [
+    ['甲方/采购方', r.client||'待确认'],
+    ['项目名称', r.title||'待确认'],
+    ['预算金额', r.budget||'未公开'],
+    ['所属行业', r.industry||'待确认']
+  ];
+  if (r.deadline) fields.push(['截止日期', r.deadline]);
+  if (r.winner) fields.push(['中标方', r.winner]);
+  if (r.biddingId) fields.push(['招标编号', r.biddingId]);
+  if (r.servicePeriod) fields.push(['服务期限', r.servicePeriod]);
+  for (var fi = 0; fi < fields.length; fi++) {
+    container.innerHTML += '<tr><td style="padding:8px 12px;border:1px solid #e0e0e0;font-size:14px;background:#f5f5f5;font-weight:600;width:110px">' + fields[fi][0] + '</td><td style="padding:8px 12px;border:1px solid #e0e0e0;font-size:14px">' + fields[fi][1] + '</td></tr>';
+  }
+  container.innerHTML += '</table>';
+  if (r.signals && r.signals.length > 0) {
+    container.innerHTML += '<h2 style="font-size:16px;color:#302b63;margin:20px 0 10px;padding-left:10px;border-left:3px solid #302b63">趋势信号</h2><p>' + r.signals.map(function(s){return '<span style="display:inline-block;padding:3px 10px;border-radius:10px;font-size:12px;margin:2px;background:#e3f2fd;color:#2980b9">'+s+'</span>'}).join(' ') + '</p>';
+  }
+  container.innerHTML += '<h2 style="font-size:16px;color:#302b63;margin:20px 0 10px;padding-left:10px;border-left:3px solid #302b63">市场分析</h2><div style="padding:12px 16px;background:#fafafa;border-radius:6px;font-size:13px;line-height:1.9;white-space:pre-wrap;border:1px solid #eee">' + (r.intelligence || '暂无自动分析数据') + '</div>';
+  if (r.notes && r.notes !== '可在此补充你的分析洞察或根据最新信息修正上述分析...') {
+    container.innerHTML += '<h2 style="font-size:16px;color:#302b63;margin:20px 0 10px;padding-left:10px;border-left:3px solid #302b63">情报解读</h2><div style="padding:12px 16px;background:#fff;border-radius:6px;font-size:13px;line-height:1.9;white-space:pre-wrap;border:1px solid #eee">' + r.notes.replace(/\n/g,'<br>') + '</div>';
+  }
+  container.innerHTML += '<div style="text-align:center;color:#999;font-size:12px;margin-top:40px;border-top:1px solid #eee;padding-top:12px">生成日期：' + (r.created||'') + ' | 来源：GEO招投标情报站</div>';
+
+  document.body.appendChild(container);
+  var opt = {
+    margin: [10, 10], filename: (r.client||'GEO') + '_GEO情报分析报告.pdf',
+    image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  if (typeof html2pdf !== 'undefined') {
+    html2pdf().set(opt).from(container).save().then(function() {
+      document.body.removeChild(container);
+      if (btn) btn.textContent = '✅ 已下载';
+      setTimeout(function() { if (btn) btn.textContent = origText; }, 2000);
+    }).catch(function() {
+      document.body.removeChild(container);
+      if (btn) btn.textContent = origText;
+      printAnalysis();
+    });
+  } else {
+    document.body.removeChild(container);
+    if (btn) btn.textContent = origText;
+    printAnalysis();
+  }
 }
 
 function deleteAnalysis(id) {
