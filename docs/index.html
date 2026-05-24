@@ -105,11 +105,12 @@
   .analysis-result .field-value.editable:focus { background: #f8f8ff; border: 1px solid #302b63; }
   .analysis-empty { text-align: center; padding: 40px; color: #ccc; }
   .analysis-history { margin-top: 16px; }
-  .analysis-history-item { padding: 10px 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-  .analysis-history-item .info { font-size: 13px; }
+  .analysis-history-item { padding: 10px 12px; border: 1px solid #f0f0f0; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background .15s; }
+  .analysis-history-item:hover { background: #f8f5ff; border-color: #d0c8e8; }
+  .analysis-history-item .info { font-size: 13px; pointer-events: none; }
   .analysis-history-item .info .name { font-weight: 600; }
   .analysis-history-item .info .detail { color: #888; font-size: 12px; }
-  .analysis-history-item .del-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 18px; padding: 4px 8px; }
+  .analysis-history-item .del-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 18px; padding: 4px 8px; pointer-events: auto; }
 
   /* ===== Analysis Report ===== */
   .analysis-report { font-size: 13px; line-height: 1.7; }
@@ -1297,6 +1298,21 @@ function downloadPdf() {
   w.document.close();
 }
 
+function restoreAnalysis(id) {
+  var saved = JSON.parse(localStorage.getItem('geo_analyses') || '[]');
+  for (var i = 0; i < saved.length; i++) {
+    if (saved[i].id === id) {
+      var r = saved[i];
+      r._intelligence = r.intelligence || '';
+      window._lastAnalysis = r;
+      document.getElementById('analysisInput').value = r.raw || '';
+      document.getElementById('analysisResult').innerHTML = formatAnalysisReport(r);
+      window.scrollTo({ top: document.getElementById('analysisResult').offsetTop - 100, behavior: 'smooth' });
+      return;
+    }
+  }
+}
+
 function deleteAnalysis(id) {
   var saved = JSON.parse(localStorage.getItem('geo_analyses') || '[]');
   saved = saved.filter(function(item) { return item.id !== id; });
@@ -1314,8 +1330,8 @@ function renderAnalysisHistory() {
   var html = '';
   for (var i = 0; i < saved.length; i++) {
     var r = saved[i];
-    html += '<div class="analysis-history-item"><div class="info"><span class="name">' + (r.client || '未知甲方') + '</span> <span class="detail">' + (r.budget || '预算未知') + ' · ' + r.created + ' · ' + (r.industry || '') + '</span></div>';
-    html += '<button class="del-btn" onclick="deleteAnalysis(\'' + r.id + '\')">×</button></div>';
+    html += '<div class="analysis-history-item" onclick="restoreAnalysis(\'' + r.id + '\')"><div class="info"><span class="name">' + (r.client || '未知甲方') + '</span> <span class="detail">' + (r.budget || '预算未知') + ' · ' + r.created + ' · ' + (r.industry || '') + '</span></div>';
+    html += '<button class="del-btn" onclick="event.stopPropagation();deleteAnalysis(\'' + r.id + '\')">×</button></div>';
   }
   container.innerHTML = html;
 }
