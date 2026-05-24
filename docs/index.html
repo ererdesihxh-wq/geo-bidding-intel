@@ -79,12 +79,7 @@
   .chart-bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; min-width: 2px; }
   .chart-bar-value { font-size: 11px; color: #888; min-width: 40px; white-space: nowrap; }
   .chart-bar-row .rank { font-size: 11px; color: #999; min-width: 20px; text-align: center; font-weight: 700; }
-  .chart-column-container { display: flex; align-items: flex-end; gap: 6px; height: 220px; padding: 0 4px; }
-  .chart-column { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 0; }
-  .chart-column .col-value { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
-  .chart-column .col-fill { width: 100%; max-width: 44px; border-radius: 4px 4px 0 0; transition: height .6s ease; min-height: 2px; }
-  .chart-column .col-label { font-size: 11px; color: #888; margin-top: 6px; white-space: nowrap; }
-  .chart-doughnut { width: 200px; height: 200px; border-radius: 50%; margin: 0 auto 16px; position: relative; }
+  .chart-doughnut { width: 200px; height: 200px; border-radius: 50%; margin: 0 auto 16px; }
   .chart-legend { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
   .chart-legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #555; }
   .chart-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
@@ -126,9 +121,6 @@
   @media (max-width: 768px) {
     .trend-grid { grid-template-columns: 1fr; }
     .analysis-layout { grid-template-columns: 1fr; }
-    .chart-column-container { overflow-x: auto; gap: 4px; padding: 0 4px; height: 180px; }
-    .chart-column .col-label { font-size: 9px; }
-    .chart-column .col-fill { max-width: 30px; }
     .chart-doughnut { width: 150px; height: 150px; }
     .chart-bar-label { min-width: 60px; font-size: 11px; }
   }
@@ -141,9 +133,6 @@
     .project { padding: 14px; }
     .filters select { min-width: 100px; }
     .tab-btn { font-size: 12px; padding: 10px 8px; }
-    .chart-column-container { height: 150px; }
-    .chart-column .col-fill { max-width: 20px; }
-    .chart-column .col-value { font-size: 10px; }
   }
 </style>
 </head>
@@ -493,13 +482,18 @@ function renderMonthlyTrend() {
   var maxVal = 0;
   for (var mi = 0; mi < months.length; mi++) { if (monthCount[months[mi]] > maxVal) maxVal = monthCount[months[mi]]; }
 
-  var html = '<div class="chart-column-container">';
-  for (var mi = 0; mi < months.length; mi++) {
+  var html = '<div style="padding:4px 0">';
+  for (var mi = months.length - 1; mi >= 0; mi--) {
     var val = monthCount[months[mi]];
-    var h = Math.max((val / maxVal) * 200, 4);
+    var pct = maxVal > 0 ? (val / maxVal) * 100 : 0;
     var parts = months[mi].split('-');
     var label = parts[0] + '年' + parseInt(parts[1]) + '月';
-    html += '<div class="chart-column"><div class="col-value" style="color:' + CHART_COLORS[mi % CHART_COLORS.length] + '">' + val + '</div><div class="col-fill" style="height:' + h + 'px;background:' + CHART_COLORS[mi % CHART_COLORS.length] + '"></div><div class="col-label">' + label + '</div></div>';
+    var color = CHART_COLORS[mi % CHART_COLORS.length];
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+    html += '<span style="min-width:72px;font-size:12px;color:#666;text-align:right;flex-shrink:0">' + label + '</span>';
+    html += '<div style="flex:1;height:20px;background:#f0f0f0;border-radius:4px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:' + color + ';border-radius:4px;transition:width .6s ease;min-width:2px"></div></div>';
+    html += '<span style="min-width:40px;font-size:12px;color:' + color + ';font-weight:700">' + val + '个</span>';
+    html += '</div>';
   }
   html += '</div>';
   document.getElementById('monthlyTrendChart').innerHTML = html;
@@ -513,11 +507,8 @@ function renderIndustryChart() {
   items.sort(function(a,b) { return b.value - a.value; });
   var maxVal = items[0].value;
 
-  // Doughnut for top 8 + other
-  var showItems = items.slice(0, 8);
-  var otherSum = 0;
-  for (var i = 8; i < items.length; i++) otherSum += items[i].value;
-  if (otherSum > 0) showItems.push({ label: '其他', value: otherSum });
+  // 全部显示，不合并"其他"
+  var showItems = items;
 
   var total = 0;
   for (var i = 0; i < showItems.length; i++) total += showItems[i].value;
