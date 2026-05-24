@@ -111,6 +111,18 @@
   .analysis-history-item .info .detail { color: #888; font-size: 12px; }
   .analysis-history-item .del-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 18px; padding: 4px 8px; }
 
+  /* ===== Analysis Report ===== */
+  .analysis-report { font-size: 13px; line-height: 1.7; }
+  .report-header { border-bottom: 2px solid #302b63; padding-bottom: 10px; margin-bottom: 16px; }
+  .report-section { margin-bottom: 16px; }
+  .report-section-title { font-size: 14px; font-weight: 700; color: #302b63; margin-bottom: 8px; padding-left: 8px; border-left: 3px solid #302b63; }
+  .report-table { width: 100%; border-collapse: collapse; }
+  .report-table td { padding: 7px 10px; border-bottom: 1px solid #f0f0f0; font-size: 13px; vertical-align: top; }
+  .report-table .rl { color: #999; font-weight: 500; min-width: 85px; white-space: nowrap; }
+  .report-table .rv { color: #333; }
+  .report-table .rv.editable { cursor: text; outline: none; border-radius: 3px; }
+  .report-table .rv.editable:focus { background: #f8f8ff; }
+
   /* ===== Badges ===== */
   .signal-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin: 2px; background: #e3f2fd; color: #2980b9; }
   .project-badges { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
@@ -599,12 +611,12 @@ function renderTrends() {
   renderProviderChart();
 }
 
-// ===== Analysis Tab =====
+// ===== Analysis Tab - Enhanced =====
 function extractClient(text) {
-  var patterns = [/招标[人方][：:]?\s*([^\s，,。]+)/, /采购[人方][：:]?\s*([^\s，,。]+)/, /业主[：:]?\s*([^\s，,。]+)/, /甲方[：:]?\s*([^\s，,。]+)/];
+  var patterns = [/招标[人方][：:]?\s*([^\s，,。\n\r]+)/, /采购[人方][：:]?\s*([^\s，,。\n\r]+)/, /业主[：:]?\s*([^\s，,。\n\r]+)/, /甲方[：:]?\s*([^\s，,。\n\r]+)/, /成交[人方][：:]?\s*([^\s，,。\n\r]+)/, /中标[人方][：:]?\s*([^\s，,。\n\r]+)/];
   for (var i = 0; i < patterns.length; i++) {
     var m = text.match(patterns[i]);
-    if (m) return m[1];
+    if (m && m[1].length > 1) return m[1].replace(/（.*）/, '');
   }
   return '';
 }
@@ -612,13 +624,19 @@ function extractClient(text) {
 function extractBudget(text) {
   var m = text.match(/([\d.]+)\s*万元/);
   if (m) return m[0];
-  m = text.match(/预算[：:]?\s*([^\s，,。]+)/);
+  m = text.match(/预算[：:]?\s*([^\s，,。\n\r]+)/);
   if (m) return m[1];
+  m = text.match(/中标[金额][额骝][：:]?\s*([^\s，,。\n\r]+)/);
+  if (m) return m[1];
+  m = text.match(/([\d.]+)\s*万[元元]/);
+  if (m) return m[0];
   return '';
 }
 
 function extractDeadline(text) {
   var m = text.match(/截止[^：:]*[：:]?\s*(\d{4}[-年]\d{1,2}[-月]\d{1,2})/);
+  if (m) return m[1].replace('年','-').replace('月','-');
+  m = text.match(/(\d{4}[-年]\d{1,2}[-月]\d{1,2})\s*[前截]/);
   if (m) return m[1].replace('年','-').replace('月','-');
   return '';
 }
@@ -629,24 +647,144 @@ function extractTitle(text) {
   var lines = text.split('\n');
   for (var i = 0; i < lines.length; i++) {
     var l = lines[i].trim();
-    if (l.indexOf('项目') > -1 && l.length < 60) return l;
+    if (l.indexOf('项目') > -1 && l.length < 60 && l.length > 4) return l;
   }
   return '';
 }
 
-function clearAnalysis() {
-  document.getElementById('analysisInput').value = '';
-  document.getElementById('analysisResult').innerHTML = '<div class="analysis-empty"><p>输入招标信息后点击"开始分析"</p></div>';
+function extractWinner(text) {
+  var patterns = [/中标[人方候][选]?[：:]?\s*([^\s，,。\n\r]{2,30})/, /成交[供][应][商][：:]?\s*([^\s，,。\n\r]{2,30})/, /第[一1]名[：:]?\s*([^\s，,。\n\r]{2,30})/, /^\s*([^\s，,。\n\r]{2,20})\s*$[\s\S]*?中标/im];
+  for (var i = 0; i < patterns.length; i++) {
+    var m = text.match(patterns[i]);
+    if (m && m[1].length > 1 && m[1].length < 30) return m[1];
+  }
+  return '';
 }
 
-function detectTextSignals(text) {
+function extractServicePeriod(text) {
+  var m = text.match(/服务[期周][：:]?\s*([^\n\r，,。]{2,30})/);
+  if (m) return m[1].trim();
+  m = text.match(/合同[期周][：:]?\s*([^\n\r，,。]{2,30})/);
+  if (m) return m[1].trim();
+  return '';
+}
+
+function extractBiddingId(text) {
+  var m = text.match(/(?:项目|招标)[编号][号\U518a][：:]?\s*([^\s，,。\n\r]{4,30})/);
+  if (m) return m[1];
+  m = text.match(/[编号][号][：:]?\s*([a-zA-Z0-9][^\s，,。\n\r]{4,30})/i);
+  if (m) return m[1];
+  return '';
+}
+
+var ANALYSIS_INDUSTRY_KW = {
+  '汽车': '汽车/出行', '出行': '汽车/出行', '本田': '汽车/出行', '丰田': '汽车/出行', '奇瑞': '汽车/出行',
+  '金融': '金融/保险', '保险': '金融/保险', '证券': '金融/保险', '银行': '金融/保险',
+  '医药': '医药/健康', '健康': '医药/健康', '药': '医药/健康', '医疗': '医药/健康',
+  '互联网': '互联网/科技', '科技': '互联网/科技', '软件': '互联网/科技', 'AI': '互联网/科技', '智能': '互联网/科技',
+  '教育': '教育', '学院': '教育', '大学': '教育', '职业': '教育', '学校': '教育',
+  '食品': '快消/食品/酒业', '酒': '快消/食品/酒业', '饮料': '快消/食品/酒业',
+  '家电': '家电/电子', '电子': '家电/电子', '电器': '家电/电子', '海信': '家电/电子',
+  '建材': '建材/家居', '家居': '建材/家居', '瓷砖': '建材/家居', '装修': '建材/家居',
+  '政府': '政府/公共事业', '政务': '政府/公共事业', '公共': '政府/公共事业',
+  '制造': '制造业/电子', '航空': '制造业/电子', '航天': '制造业/电子',
+  '企业服务': '企业服务', '咨询': '企业服务', 'SaaS': '企业服务', '招标': '企业服务',
+  '传媒': '互联网/科技', '广电': '互联网/科技', '文化': '互联网/科技',
+  '物流': '企业服务', '供应链': '企业服务', '快递': '企业服务',
+};
+
+function detectIndustry(text, clientName) {
+  var combined = text + ' ' + (clientName || '');
+  var best = '', bestScore = 0;
+  for (var kw in ANALYSIS_INDUSTRY_KW) {
+    var score = 0;
+    if (combined.indexOf(kw) > -1) {
+      score = kw.length * 2;
+      if (clientName && clientName.indexOf(kw) > -1) score += 20;
+      if (score > bestScore) { bestScore = score; best = ANALYSIS_INDUSTRY_KW[kw]; }
+    }
+  }
+  return best || '待确认';
+}
+
+function detectTextSignals(text, industry) {
   var signals = [];
-  if (text.indexOf('政府') > -1) signals.push('🏛 政府采购');
-  if (text.indexOf('金融') > -1) signals.push('🏦 金融行业');
+  if (text.indexOf('政府') > -1 || industry === '政府/公共事业') signals.push('🏛 政府采购');
+  if (text.indexOf('金融') > -1 || industry === '金融/保险') signals.push('🏦 金融行业');
   if (text.indexOf('年框') > -1) signals.push('📅 年框制');
-  if (text.indexOf('国际') > -1 || text.indexOf('海外') > -1) signals.push('🌐 国际GEO');
-  if (text.indexOf('智能体') > -1) signals.push('🤖 AI智能体');
+  if (text.indexOf('国际') > -1 || text.indexOf('海外') > -1 || text.indexOf('gemini') > -1) signals.push('🌐 国际GEO');
+  if (text.indexOf('智能体') > -1 || text.indexOf('智能获客') > -1) signals.push('🤖 AI智能体');
+  if (text.indexOf('亏损') > -1 || text.indexOf('下降') > -1) signals.push('⚠️ 逆境投入');
+  if (text.indexOf('中标') > -1 || text.indexOf('成交') > -1) signals.push('✅ 已出结果');
+  if (text.indexOf('多品牌') > -1 || text.indexOf('多品类') > -1) signals.push('🏢 多品牌覆盖');
   return signals;
+}
+
+function matchExistingProjects(text, client, industry) {
+  if (!data || !data.projects) return [];
+  var matches = [];
+  for (var i = 0; i < data.projects.length; i++) {
+    var p = data.projects[i];
+    var score = 0;
+    if (client && p.company.indexOf(client) > -1) score += 10;
+    if (client && client.indexOf(p.company) > -1) score += 8;
+    if (industry && p.industry === industry) score += 5;
+    if (text && p.company.split('')[0] && text.indexOf(p.company.split('')[0]) > -1) {
+      for (var ci = 0; ci < p.company.length - 1; ci++) {
+        if (text.indexOf(p.company[ci]) > -1) { score += 2; break; }
+      }
+    }
+    if (score >= 4) matches.push({ project: p, score: score });
+  }
+  matches.sort(function(a, b) { return b.score - a.score; });
+  return matches.slice(0, 6);
+}
+
+function formatAnalysisReport(result) {
+  var similar = matchExistingProjects(result.raw, result.client, result.industry);
+  var signalsHtml = '';
+  for (var i = 0; i < result.signals.length; i++) signalsHtml += '<span class="signal-tag">' + result.signals[i] + '</span>';
+
+  var html = '<div class="analysis-report">';
+  html += '<div class="report-header"><h3 style="margin:0 0 4px 0;font-size:16px">GEO情报分析报告</h3>';
+  html += '<span style="font-size:12px;color:#999">' + result.created + ' 生成</span></div>';
+
+  html += '<div class="report-section"><div class="report-section-title">📋 基本信息</div><table class="report-table">';
+  html += '<tr><td class="rl">甲方/采购方</td><td class="rv editable" contenteditable="true">' + (result.client || '待确认') + '</td></tr>';
+  html += '<tr><td class="rl">项目名称</td><td class="rv editable" contenteditable="true">' + (result.title || '待确认') + '</td></tr>';
+  html += '<tr><td class="rl">预算金额</td><td class="rv editable" contenteditable="true">' + (result.budget || '未公开') + '</td></tr>';
+  html += '<tr><td class="rl">所属行业</td><td class="rv"><span class="industry-tag" style="background:#e8eaf6;color:#302b63">' + result.industry + '</span></td></tr>';
+  if (result.deadline) html += '<tr><td class="rl">截止日期</td><td class="rv">' + result.deadline + '</td></tr>';
+  if (result.winner) html += '<tr><td class="rl">中标方</td><td class="rv editable" contenteditable="true" style="color:#c0392b;font-weight:600">' + result.winner + '</td></tr>';
+  if (result.biddingId) html += '<tr><td class="rl">招标编号</td><td class="rv">' + result.biddingId + '</td></tr>';
+  if (result.servicePeriod) html += '<tr><td class="rl">服务期限</td><td class="rv editable" contenteditable="true">' + result.servicePeriod + '</td></tr>';
+  html += '</table></div>';
+
+  if (signalsHtml) {
+    html += '<div class="report-section"><div class="report-section-title">🔍 趋势信号</div><div style="display:flex;flex-wrap:wrap;gap:6px">' + signalsHtml + '</div></div>';
+  }
+
+  if (similar.length > 0) {
+    html += '<div class="report-section"><div class="report-section-title">📊 行业对标</div>';
+    html += '<div style="font-size:12px;color:#999;margin-bottom:8px">已收录的同行业/同类型项目：</div>';
+    html += '<table class="report-table"><tr><td class="rl" style="color:#666;font-size:12px">甲方</td><td class="rl" style="color:#666;font-size:12px">金额</td><td class="rl" style="color:#666;font-size:12px">状态</td><td class="rl" style="color:#666;font-size:12px">中标方</td></tr>';
+    for (var i = 0; i < similar.length; i++) {
+      var sp = similar[i].project;
+      html += '<tr><td class="rv" style="font-size:12px">' + sp.company + '</td><td class="rv" style="font-size:12px">' + (sp.budget && sp.budget !== '未公开' ? sp.budget : '—') + '</td><td class="rv" style="font-size:12px">' + statusTag(sp.status) + '</td><td class="rv" style="font-size:12px">' + (sp.winner || '—') + '</td></tr>';
+    }
+    html += '</table></div>';
+  }
+
+  html += '<div class="report-section"><div class="report-section-title">💡 情报解读</div>';
+  html += '<div contenteditable="true" style="min-height:60px;padding:10px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;line-height:1.7;color:#333;background:#fafafa;outline:none" id="analysisNotes">' + (result.notes || '在此输入你的分析洞察...') + '</div></div>';
+
+  html += '<div class="analysis-actions" style="margin-top:16px">';
+  html += '<button class="btn-primary" onclick="saveAnalysis()">💾 保存记录</button>';
+  html += '<button class="btn-secondary" onclick="copyAnalysisText()">📋 复制报告</button>';
+  html += '<button class="btn-secondary" onclick="printAnalysis()">🖨️ 导出PDF</button>';
+  html += '</div></div>';
+
+  return html;
 }
 
 function runAnalysis() {
@@ -657,53 +795,42 @@ function runAnalysis() {
   var budget = extractBudget(text);
   var deadline = extractDeadline(text);
   var title = extractTitle(text);
-  var signals = detectTextSignals(text);
+  var winner = extractWinner(text);
+  var servicePeriod = extractServicePeriod(text);
+  var biddingId = extractBiddingId(text);
+  var industry = detectIndustry(text, client);
+  var signals = detectTextSignals(text, industry);
 
   var result = {
     id: 'A-' + Date.now().toString(36),
     client: client, budget: budget, deadline: deadline,
-    title: title,
-    signals: signals, raw: text,
-    created: new Date().toISOString().substring(0, 10),
-    notes: ''
+    title: title, winner: winner,
+    servicePeriod: servicePeriod, biddingId: biddingId,
+    industry: industry, signals: signals, raw: text,
+    created: new Date().toISOString().substring(0, 10), notes: ''
   };
 
-  renderAnalysisResult(result);
+  window._lastAnalysis = result;
+  document.getElementById('analysisResult').innerHTML = formatAnalysisReport(result);
 }
 
-function renderAnalysisResult(result) {
-  var signalsHtml = '';
-  for (var i = 0; i < result.signals.length; i++) {
-    signalsHtml += '<span class="signal-tag">' + result.signals[i] + '</span>';
-  }
-
-  var html = '<div class="analysis-result">';
-  html += '<div class="field"><span class="field-label">甲方/采购方</span><span class="field-value editable" contenteditable="true">' + (result.client || '待确认') + '</span></div>';
-  html += '<div class="field"><span class="field-label">项目名称</span><span class="field-value editable" contenteditable="true">' + (result.title || '待确认') + '</span></div>';
-  html += '<div class="field"><span class="field-label">预算/金额</span><span class="field-value editable" contenteditable="true">' + (result.budget || '未公开') + '</span></div>';
-  html += '<div class="field"><span class="field-label">截止日期</span><span class="field-value editable" contenteditable="true">' + (result.deadline || '未知') + '</span></div>';
-  html += '<div class="field"><span class="field-label">趋势信号</span><span class="field-value">' + (signalsHtml || '<span style="color:#ccc">无</span>') + '</span></div>';
-  html += '<div class="field" style="border-bottom:none"><span class="field-label">情报解读</span><span class="field-value editable" contenteditable="true" style="min-height:40px">' + (result.notes || '') + '</span></div>';
-  html += '</div>';
-  html += '<div class="analysis-actions" style="margin-top:16px">';
-  html += '<button class="btn-primary" onclick="saveAnalysis()">💾 保存到本地</button>';
-  html += '<button class="btn-secondary" onclick="copyAnalysisJSON()">📋 复制JSON</button>';
-  html += '<button class="btn-secondary" onclick="exportAnalysisJSON()">📥 导出下载</button>';
-  html += '</div>';
-
-  document.getElementById('analysisResult').innerHTML = html;
-  window._lastAnalysis = result;
+function clearAnalysis() {
+  document.getElementById('analysisInput').value = '';
+  document.getElementById('analysisResult').innerHTML = '<div class="analysis-empty"><p>输入招标信息后点击"开始分析"</p></div>';
 }
 
 function getResultFields() {
-  var fields = document.querySelectorAll('#analysisResult .field-value.editable');
   if (!window._lastAnalysis) return null;
   var r = JSON.parse(JSON.stringify(window._lastAnalysis));
-  if (fields.length >= 1) r.client = fields[0].textContent.trim();
-  if (fields.length >= 2) r.title = fields[1].textContent.trim();
-  if (fields.length >= 3) r.budget = fields[2].textContent.trim();
-  if (fields.length >= 4) r.deadline = fields[3].textContent.trim();
-  if (fields.length >= 8) r.notes = fields[7].textContent.trim();
+  var editableCells = document.querySelectorAll('.report-table .rv.editable');
+  if (editableCells.length >= 1) r.client = editableCells[0].textContent.trim() || r.client;
+  if (editableCells.length >= 2) r.title = editableCells[1].textContent.trim() || r.title;
+  if (editableCells.length >= 3) r.budget = editableCells[2].textContent.trim() || r.budget;
+  var notesField = document.getElementById('analysisNotes');
+  if (notesField) {
+    var notes = notesField.textContent.trim();
+    if (notes !== '在此输入你的分析洞察...') r.notes = notes;
+  }
   return r;
 }
 
@@ -717,21 +844,55 @@ function saveAnalysis() {
   alert('已保存分析记录');
 }
 
-function copyAnalysisJSON() {
+function copyAnalysisText() {
   var r = getResultFields();
   if (!r) return;
-  var json = JSON.stringify(r, null, 2);
-  navigator.clipboard.writeText(json).then(function() { alert('JSON 已复制到剪贴板'); });
+  var t = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  GEO情报分析报告\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  t += '【基本信息】\n甲方/采购方：' + (r.client || '待确认') + '\n项目名称：' + (r.title || '待确认') + '\n预算金额：' + (r.budget || '未公开') + '\n所属行业：' + (r.industry || '待确认');
+  if (r.deadline) t += '\n截止日期：' + r.deadline;
+  if (r.winner) t += '\n中标方：' + r.winner;
+  if (r.biddingId) t += '\n招标编号：' + r.biddingId;
+  if (r.servicePeriod) t += '\n服务期限：' + r.servicePeriod;
+  if (r.signals && r.signals.length > 0) t += '\n\n【趋势信号】\n' + r.signals.map(function(s) { return '  ' + s; }).join('\n');
+  if (r.notes && r.notes !== '在此输入你的分析洞察...') t += '\n\n【情报解读】\n' + r.notes;
+  t += '\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n生成日期：' + (r.created || '') + ' | 来源：GEO招投标情报站\n';
+  navigator.clipboard.writeText(t).then(function() { alert('报告已复制到剪贴板\n可直接粘贴到微信、飞书、邮件等'); });
 }
 
-function exportAnalysisJSON() {
+function printAnalysis() {
   var r = getResultFields();
   if (!r) return;
-  var blob = new Blob([JSON.stringify(r, null, 2)], { type: 'application/json' });
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'geo-analysis-' + r.id + '.json';
-  a.click();
+  var w = window.open('', '_blank');
+  var h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>GEO情报分析报告</title>';
+  h += '<style>body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;padding:40px;color:#333;line-height:1.8}';
+  h += 'h1{font-size:22px;text-align:center;border-bottom:2px solid #302b63;padding-bottom:12px;margin-bottom:20px}';
+  h += 'h2{font-size:16px;color:#302b63;margin:20px 0 10px;padding-left:10px;border-left:3px solid #302b63}';
+  h += 'table{width:100%;border-collapse:collapse;margin:12px 0}';
+  h += 'td{padding:8px 12px;border:1px solid #e0e0e0;font-size:14px}';
+  h += 'td.l{background:#f5f5f5;font-weight:600;width:110px}';
+  h += '.sig{display:inline-block;padding:3px 10px;border-radius:10px;font-size:12px;margin:2px}';
+  h += '.nt{border:1px solid #e0e0e0;padding:12px;border-radius:6px;background:#fafafa;font-size:13px;line-height:1.7}';
+  h += '.ft{text-align:center;color:#999;font-size:12px;margin-top:40px;border-top:1px solid #eee;padding-top:12px}';
+  h += '@media print{body{padding:20px}}</style></head><body>';
+  h += '<h1>GEO情报分析报告</h1>';
+  h += '<table><tr><td class="l">甲方/采购方</td><td>' + (r.client||'待确认') + '</td></tr>';
+  h += '<tr><td class="l">项目名称</td><td>' + (r.title||'待确认') + '</td></tr>';
+  h += '<tr><td class="l">预算金额</td><td>' + (r.budget||'未公开') + '</td></tr>';
+  h += '<tr><td class="l">所属行业</td><td>' + (r.industry||'待确认') + '</td></tr>';
+  if (r.deadline) h += '<tr><td class="l">截止日期</td><td>' + r.deadline + '</td></tr>';
+  if (r.winner) h += '<tr><td class="l">中标方</td><td><strong>' + r.winner + '</strong></td></tr>';
+  if (r.biddingId) h += '<tr><td class="l">招标编号</td><td>' + r.biddingId + '</td></tr>';
+  if (r.servicePeriod) h += '<tr><td class="l">服务期限</td><td>' + r.servicePeriod + '</td></tr></table>';
+  if (r.signals && r.signals.length > 0) {
+    h += '<h2>趋势信号</h2><p>';
+    for (var i = 0; i < r.signals.length; i++) h += '<span class="sig">' + r.signals[i] + '</span> ';
+    h += '</p>';
+  }
+  if (r.notes && r.notes !== '在此输入你的分析洞察...') h += '<h2>情报解读</h2><div class="nt">' + r.notes.replace(/\n/g,'<br>') + '</div>';
+  h += '<div class="ft">生成日期：' + (r.created||'') + ' | 来源：GEO招投标情报站</div>';
+  h += '<script>window.onload=function(){window.print()}<\/script></body></html>';
+  w.document.write(h);
+  w.document.close();
 }
 
 function deleteAnalysis(id) {
@@ -751,7 +912,7 @@ function renderAnalysisHistory() {
   var html = '';
   for (var i = 0; i < saved.length; i++) {
     var r = saved[i];
-    html += '<div class="analysis-history-item"><div class="info"><span class="name">' + (r.client || '未知甲方') + '</span> <span class="detail">' + (r.budget || '预算未知') + ' · ' + r.created + ' · P' + r.priority.replace('P','') + '</span></div>';
+    html += '<div class="analysis-history-item"><div class="info"><span class="name">' + (r.client || '未知甲方') + '</span> <span class="detail">' + (r.budget || '预算未知') + ' · ' + r.created + ' · ' + (r.industry || '') + '</span></div>';
     html += '<button class="del-btn" onclick="deleteAnalysis(\'' + r.id + '\')">×</button></div>';
   }
   container.innerHTML = html;
