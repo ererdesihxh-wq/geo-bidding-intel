@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """GEO招投标情报 - 完整数据集构建脚本"""
-import json, os, sys, io
+import json, os, sys, io, re
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -489,6 +489,49 @@ for p in projects:
         "signals": detect_trend_signals(p),
     }
     enriched_projects.append(ep)
+
+# ===== 合并爬虫发现的项目 =====
+CRAWLED_PATH = os.path.join(BASE_DIR, "data", "crawled_projects.json")
+curated_ids = {p.get("source_url", "") for p in projects if p.get("source_url")}
+curated_norm_titles = {
+    re.sub(r'[\s\-—｜|()（）·,，。、]+', '', p.get("title", "")).lower()[:30]
+    for p in projects if p.get("title")
+}
+
+if os.path.exists(CRAWLED_PATH):
+    with open(CRAWLED_PATH, "r", encoding="utf-8") as f:
+        crawled_data = json.load(f)
+    for cp in crawled_data.get("projects", []):
+        # 去重检查：URL匹配
+        if cp.get("source_url", "") in curated_ids:
+            continue
+        # 去重检查：规范化标题匹配
+        ct_norm = re.sub(r'[\s\-—｜|()（）·,，。、]+', '', cp.get("title", "")).lower()[:30]
+        if ct_norm:
+            is_dup = False
+            for t_norm in curated_norm_titles:
+                if not t_norm or not ct_norm:
+                    continue
+                if len(ct_norm) >= 10 and ct_norm in t_norm:
+                    is_dup = True
+                    break
+                if len(t_norm) >= 10 and t_norm in ct_norm:
+                    is_dup = True
+                    break
+                if ct_norm[:15] == t_norm[:15]:
+                    is_dup = True
+                    break
+            if is_dup:
+                continue
+        # 应用行业合并映射
+        raw_industry = cp.get("industry", "")
+        cp["industry"] = INDUSTRY_MAP.get(raw_industry, raw_industry or "待分类")
+        cp["_computed"] = {
+            "budget_wan": parse_budget_wan(cp.get("budget", "")),
+            "signals": detect_trend_signals(cp),
+        }
+        enriched_projects.append(cp)
+        print(f"Merged crawled: {cp.get('id', '?')} - {cp.get('title', '')[:50]}")
 
 data = {
   "meta": {
