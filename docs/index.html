@@ -147,6 +147,47 @@
     .filters select { min-width: 100px; }
     .tab-btn { font-size: 12px; padding: 10px 8px; }
   }
+  @media print {
+    body { background: #fff !important; padding: 0 !important; }
+    .tabs, .filters, .header, .stats, .footer, .analysis-actions, .trend-grid, .chart-card { display: none !important; }
+    .container { max-width: 100%; padding: 0; }
+    .tab-pane.active { display: block !important; }
+    .analysis-result, .analysis-report { background: #fff !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+    .report-section { break-inside: avoid; page-break-inside: avoid; }
+    .project { break-inside: avoid; page-break-inside: avoid; }
+    @page { margin: 1.5cm; }
+  }
+
+  /* ===== Project Detail Page ===== */
+  .detail-page { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #f5f7fa; z-index: 9999; overflow-y: auto; transform: translateX(100%); transition: transform .35s cubic-bezier(.4,0,.2,1); }
+  .detail-page.show { transform: translateX(0); }
+  .detail-header { position: sticky; top: 0; z-index: 10; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: #fff; padding: 16px 20px; display: flex; align-items: center; gap: 12px; min-height: 56px; }
+  .detail-back { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.12); border: none; color: #fff; font-size: 14px; font-weight: 600; padding: 8px 16px 8px 12px; border-radius: 8px; cursor: pointer; font-family: inherit; transition: background .2s; flex-shrink: 0; }
+  .detail-back:hover { background: rgba(255,255,255,.22); }
+  .detail-header-title { font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .detail-body { max-width: 720px; margin: 0 auto; padding: 24px 20px 48px; }
+  .detail-company { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+  .detail-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; color: #888; margin: 10px 0 16px; }
+  .detail-meta span { display: inline-flex; align-items: center; gap: 4px; }
+  .detail-section { margin: 20px 0; }
+  .detail-section-title { font-size: 13px; font-weight: 700; color: #302b63; padding-left: 8px; border-left: 3px solid #302b63; margin-bottom: 10px; }
+  .detail-summary { font-size: 14px; color: #444; line-height: 1.8; background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #f0f0f0; }
+  .detail-winner { margin-top: 12px; padding: 14px 18px; background: #fff8f0; border-radius: 10px; border-left: 3px solid #e67e22; font-size: 14px; color: #c0392b; border: 1px solid #f5e6d0; }
+  .detail-link { margin-top: 24px; }
+  .detail-link a { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #302b63; color: #fff; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; transition: background .2s; }
+  .detail-link a:hover { background: #1a1640; }
+  .detail-signals { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+  .detail-body .tag { margin-left: 0; vertical-align: baseline; }
+  .detail-project-card { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #f0f0f0; margin-bottom: 12px; cursor: pointer; transition: box-shadow .2s; }
+  .detail-project-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .detail-project-card .pc-company { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+  .detail-project-card .pc-meta { font-size: 12px; color: #999; margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap; }
+  @media (max-width: 600px) {
+    .detail-body { padding: 16px 14px 32px; }
+    .detail-company { font-size: 17px; }
+    .detail-header { padding: 12px 14px; }
+    .detail-header-title { font-size: 13px; }
+  }
 </style>
 </head>
 <body>
@@ -249,7 +290,7 @@
 
 <script>
 // ===== 内置数据（确保本地打开也能用） =====
-var INLINE_DATA = {"meta": {"name": "GEO招投标情报站", "description": "GEO（生成式引擎优化）领域真实招标、投标、中标情报追踪。每个项目均来自官方招标平台或企业官网公告。", "last_updated": "2026-05-24", "total_projects": 31, "data_sources": ["华润集团守正电子招标平台", "中国政府采购网", "各企业官网招标页面", "招标投标公共服务平台", "广州公共资源交易中心", "中粮E采供应链采购平台", "东风汽车采购招投标平台", "京东招标平台", "美团采购平台"], "note": "仅收录明确标注'GEO优化''生成式引擎优化''AI搜索优化'或实质为GEO的项目。排除地理信息(GIS)类GEO项目。"}, "projects": [{"id": "GEO-2025-001", "company": "九号公司", "industry": "汽车/出行", "title": "2025年短交通产品GEO生成式引擎优化服务供应商招标", "status": "已截止", "budget": "保证金1万元", "bid_deadline": "2025-10-15", "publish_date": "2025-09-23", "summary": "九号公司（Segway-Ninebot）就2025-2026年短交通产品线GEO生成式引擎优化服务进行招标。要求供应商成立≥3年、注册资金≥100万、社保≥10人、年度营业额≥300万，具有3个以上同行业头部客户成功案例。服务期至2026年4月。", "winner": "", "source_url": "https://www.ygbid.com/tender/20250923203620200003.html", "_computed": {"budget_wan": 1.0, "signals": []}}, {"id": "GEO-2025-003", "company": "华润饮料（怡宝）", "industry": "快消/食品/酒业", "title": "华润饮料2025-2026年企业品牌优化第三方服务项目（含GEO/SEO）", "status": "已截止", "budget": "未公开", "bid_deadline": "2025-05-12", "publish_date": "2025-05-07", "summary": "华润怡宝（华润饮料）2025-2026年企业品牌优化第三方服务项目，包含搜索引擎内容引擎优化（GEO/SEO）、百科优化等。要求百度百科词条搭建更新、新闻稿件≥80篇、问答平台内容≥40组，覆盖品牌词及行业词优化。", "winner": "", "source_url": "https://www.ygbid.com/tender/20250507160004900002.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-001", "company": "东阿阿胶（华润集团）", "industry": "医药/健康", "title": "2026年东阿阿胶GEO优化项目询比采购", "status": "已中标", "budget": "未公开", "bid_deadline": "2026-03-19", "publish_date": "2026-03-11", "summary": "华润集团旗下东阿阿胶2026年GEO优化项目。成交供应商为秒针信息技术有限公司和福建新升代数字技术有限公司。属于华润系企业第二批GEO集中采购，覆盖品牌在主流AI平台的可见度优化。", "winner": "秒针信息技术有限公司、福建新升代数字技术有限公司", "source_url": "https://szecp.crc.com.cn/zbxx/006002/006002003/20260403/YYCJGG202603310003.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-002", "company": "昆药集团（华润旗下）", "industry": "医药/健康", "title": "GEO AI搜索引擎优化采购项目", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-02-06", "publish_date": "2026-02-02", "summary": "华润旗下昆药集团GEO AI搜索引擎优化服务采购，为华润系企业首批GEO优化项目之一。采购编号SJCGXY202602020002。", "winner": "", "source_url": "https://szecp.crc.com.cn/zbxx/006002/006002001/20260202/SJXYGG202602020002.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-003", "company": "扬子江药业集团", "industry": "医药/健康", "title": "2026年品牌宣传部GEO项目", "status": "招标中", "budget": "未公开", "bid_deadline": "2026-04-27", "publish_date": "2026-04-20", "summary": "扬子江药业集团品牌宣传部2026年GEO项目招标，服务地点北京朝阳区，服务周期半年。进行相关词条的GEO优化，提升品牌在AI搜索引擎中的可见度。来源：扬子江药业集团官网招标页面。", "winner": "", "source_url": "https://www.yangzijiang.com/Bidding/4396.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-004", "company": "天翼云", "industry": "互联网/科技", "title": "2026年官网GEO优化服务采购项目", "status": "已中标", "budget": "106.5万元", "bid_deadline": "2026-03-20", "publish_date": "2026-03-10", "summary": "天翼云2026年官网GEO优化服务采购，第一中标候选人为北京鲲鹏伟业广告有限公司，投标报价1,065,000元（不含增值税）。招标代理为中捷通信有限公司。", "winner": "北京鲲鹏伟业广告有限公司", "source_url": "https://bj.zhiliaobiaoxun.com/article/91704077", "_computed": {"budget_wan": 106.5, "signals": ["💰 高预算(≥100万)"]}}, {"id": "GEO-2026-005", "company": "新明珠集团（冠珠瓷砖）", "industry": "建材/家居", "title": "冠珠瓷砖2026年GEO优化项目", "status": "招标中", "budget": "30万元", "bid_deadline": "2026-05-24", "publish_date": "2026-05-10", "summary": "新明珠集团旗下冠珠瓷砖年度GEO优化项目，预算30万元（含税），服务周期一年。需求包括品牌知识库构建、技术内容优化、AI舆情监控等，要求覆盖主流AI平台。", "winner": "", "source_url": "https://gs.qianlima.com/zbcontent-597667495.html", "_computed": {"budget_wan": 30.0, "signals": []}}, {"id": "GEO-2026-006", "company": "东鹏控股", "industry": "建材/家居", "title": "innoci外贸独立站建设及GEO优化项目", "status": "已截止", "budget": "保证金3万元", "bid_deadline": "2026-04-23", "publish_date": "2026-04-09", "summary": "东鹏控股innoci外贸独立站建设及GEO优化项目投标邀请，招标编号2026DPCG-39。含外贸独立站建设与GEO优化双重需求。", "winner": "", "source_url": "http://www.ygbid.com/tender/20260409092926900001.html", "_computed": {"budget_wan": 3.0, "signals": []}}, {"id": "GEO-2026-007", "company": "宁波市北仑区旅游发展服务中心", "industry": "政府/公共事业", "title": "梅山湾旅游度假区2026年度线上平台全矩阵运维采购", "status": "已开标", "budget": "50万元", "bid_deadline": "2026-04-24", "publish_date": "2026-04-03", "summary": "宁波北仑区政府采购项目，预算50万元。包含内容采编、AI客服、网站运维及GEO（生成式搜索引擎）优化。服务期2026年5月至2027年5月。政采云公开招标。标志着GEO正式进入政府采购体系。", "winner": "", "source_url": "https://zfcg.czj.ningbo.gov.cn/project/zcyNotice_view.aspx?Id=202604031716152039995385371561984", "_computed": {"budget_wan": 50.0, "signals": ["🏛 政府采购", "🎓 公共采购"]}}, {"id": "GEO-2026-008", "company": "中航电测仪器（西安）有限公司", "industry": "制造业/电子", "title": "GEO生成式引擎优化询价采购", "status": "招标中", "budget": "未公开", "bid_deadline": "2026-05-31", "publish_date": "2026-05-13", "summary": "中航电测仪器（西安）有限公司就GEO生成式引擎优化服务进行询价采购，数量1套。中航工业体系内企业开始布局GEO优化。", "winner": "", "source_url": "http://www.yfbzb.com/inviteBid/detail/20260513_596834322.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-009", "company": "和君职业学院", "industry": "教育", "title": "生成式AI搜索引擎GEO优化服务项目", "status": "已成交", "budget": "8万元", "bid_deadline": "2026-05-20", "publish_date": "2026-05-15", "summary": "和君职业学院招生办GEO优化服务项目，单一来源采购，成交金额8万元。要求覆盖DeepSeek、豆包、文心一言、通义千问等4个平台共60个优化任务，品牌正向率≥80%。成交供应商为芜湖小象园教育科技有限公司。", "winner": "芜湖小象园教育科技有限公司", "source_url": "https://www.hejuncollege.com/tzgg/14378.html", "_computed": {"budget_wan": 8.0, "signals": ["🎓 公共采购"]}}, {"id": "GEO-2026-010", "company": "南昌航空大学科技学院", "industry": "教育", "title": "2026年招生宣传AI大模型词条优化服务采购", "status": "招标中", "budget": "4万元", "bid_deadline": "2026-05-29", "publish_date": "2026-05-22", "summary": "南昌航空大学科技学院AI大模型词条优化服务采购，预算4万元。需覆盖豆包、DeepSeek、文心一言、通义千问、Kimi、腾讯元宝等主流AI平台，提升品牌提及率和词条触发成功率。", "winner": "", "source_url": "http://www.yfbzb.com/inviteBid/detail/20260522_599259155.html", "_computed": {"budget_wan": 4.0, "signals": ["🎓 公共采购"]}}, {"id": "GEO-2026-011", "company": "浙东数字经济产业园运营中心", "industry": "企业服务", "title": "GEO优化智能获客系统采购项目", "status": "已中标", "budget": "68.9万元", "bid_deadline": "2026-05-06", "publish_date": "2026-04-25", "summary": "浙东数字经济产业园运营中心GEO优化智能获客系统采购，竞争性谈判，中标金额68.9万元。含系统部署、地域标签配置、客流分析、区域投放优化、客户画像、数据看板及1年质保运维。", "winner": "武汉市仙念仙信息科技有限公司", "source_url": "http://www.zgggzy.com/jieguo/show.php?itemid=100000", "_computed": {"budget_wan": 68.9, "signals": ["🤖 AI智能体"]}}, {"id": "GEO-2026-012", "company": "奇瑞汽车", "industry": "汽车/出行", "title": "2025年奇瑞营销产品SEO、GEO优化代理招标项目", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-01-20", "publish_date": "2026-01-14", "summary": "奇瑞汽车2025年营销产品SEO、GEO优化代理招标，采购编号CGXM-202601-0486。招标方为瑞鲸（安徽）供应链科技有限公司。2026年3月发布变更公告。", "winner": "", "source_url": "https://ebd.mychery.com/en/zd20=jsgcbg/20260310/1216064709006983168.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-013", "company": "易招标（招采进宝）", "industry": "企业服务", "title": "GEO优化服务采购项目", "status": "已中标", "budget": "含激励机制", "bid_deadline": "2026-04-23", "publish_date": "2026-04-16", "summary": "易招标平台自身就GEO优化服务进行采购，服务期至少90天，包含激励机制。招标采购平台自身采购GEO服务，体现了行业对GEO的认可。", "winner": "", "source_url": "https://china.zcjb.com.cn/cms/china/webfile/detail/index.html?contentId=1229839006590566400", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-014", "company": "广州白云山医药集团", "industry": "医药/健康", "title": "系列产品官网制作搭建（含SEO&GEO）", "status": "招标中", "budget": "35万元", "bid_deadline": "2026-05-15", "publish_date": "2026-04-20", "summary": "广州白云山制药总厂系列产品官网制作搭建项目，明确包含SEO和GEO优化需求，预算35万元。官网建设+AI搜索优化一体化采购。", "winner": "", "source_url": "http://ygcg.gzggzy.cn/m92/fw/20260429/391578.html", "_computed": {"budget_wan": 35.0, "signals": []}}, {"id": "GEO-2026-015", "company": "阿坝师范学院", "industry": "教育", "title": "2026年招生宣传AI优化呈现服务采购", "status": "已中标", "budget": "4.5万元", "bid_deadline": "2026-05-07", "publish_date": "2026-04-28", "summary": "阿坝师范学院2026年招生宣传AI优化呈现服务询价采购，预算4.5万元。要求在主流AI平台（豆包、DeepSeek、文心一言等）优化招生宣传信息展示。", "winner": "", "source_url": "https://jw.abtu.edu.cn/info/1131/5141.htm", "_computed": {"budget_wan": 4.5, "signals": ["🎓 公共采购"]}}, {"id": "GEO-2026-017", "company": "东风本田", "industry": "汽车/出行", "title": "东风Honda 2026年GEO项目（生成式引擎优化）", "status": "已中标", "budget": "1207万元", "bid_deadline": "2025-03-16", "publish_date": "2025-02-13", "summary": "东风本田2026年GEO项目，在DeepSeek、Kimi、元宝、豆包、文心一言、通义千问等6个AI平台中针对预设问题持续推荐指定车型。要求维持至少1年推荐效果。中标方为新智科技发展有限公司，中标金额约1207万元。", "winner": "新智科技发展有限公司", "source_url": "https://www.bidchance.com/info-zhongbiao-95693f7b5995c646dd4ce3fffed20dbc.html", "_computed": {"budget_wan": 1207.0, "signals": ["💰 高预算(≥100万)"]}}, {"id": "GEO-2026-018", "company": "广汽汇理租赁", "industry": "金融/保险", "title": "广汽汇理租赁品牌公关传播及GEO服务项目", "status": "已中标", "budget": "180万元", "bid_deadline": "2026-04-30", "publish_date": "2026-04-09", "summary": "广州广汽汇理融资租赁有限公司品牌公关传播及GEO服务项目，采购控制价180万元（总价包干）。第一中标候选人北京智慧星光信息技术股份有限公司（160万元），第二北京艾信博睿管理顾问有限公司（142.8万元），第三北京新智科技发展有限公司（146万元）。服务期两年。", "winner": "北京智慧星光信息技术股份有限公司", "source_url": "https://ygcg.gzggzy.cn/p92/fw3/20260507/393930.html", "_computed": {"budget_wan": 180.0, "signals": ["🏦 金融行业", "💰 高预算(≥100万)"]}}, {"id": "GEO-2026-019", "company": "中英人寿", "industry": "金融/保险", "title": "2026年中英人寿GEO（AI搜索引擎优化）项目", "status": "已中标", "budget": "未公开", "bid_deadline": "2026-04-01", "publish_date": "2026-04-02", "summary": "中英人寿2026年GEO（AI搜索引擎优化）项目，采购方式为谈判采购（分散）。成交供应商为数说故事人工智能科技股份有限公司。属于保险行业较早启动GEO采购的项目之一。", "winner": "数说故事人工智能科技股份有限公司", "source_url": "https://beijing.zhaobiao.cn/succeed_v_02ff8ee34ccd4f7874f6b9ca1691768d.html", "_computed": {"budget_wan": null, "signals": ["🏦 金融行业"]}}, {"id": "GEO-2026-020", "company": "五粮液", "industry": "快消/食品/酒业", "title": "AI平台内容优化项目（GEO生成式引擎优化）", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-01-29", "publish_date": "2026-01-09", "summary": "四川五粮液浓香酒有限公司AI平台内容优化项目（实质为GEO），项目编号五粮液浓香招﹝2025﹞154号。要求在DeepSeek、豆包、元宝等主流AI平台进行品牌内容优化。服务期2026年1月至12月。五粮液电子招投标平台发布，需CFCA证书参与。", "winner": "", "source_url": "https://www.chinabidding.cn/zbgg/U-vzwzYjW.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-021", "company": "中粮肉食", "industry": "快消/食品/酒业", "title": "2026年口碑舆情监测及SEO、GEO优化项目", "status": "已截止", "budget": "95万元", "bid_deadline": "2026-02-04", "publish_date": "2026-01-30", "summary": "中粮肉食投资有限公司2026年口碑舆情监测及SEO、GEO优化项目，最高限价95万元（含税）。项目编号GN2026-44-0706。采购代理为安徽省招标集团股份有限公司。服务期2026年2月至2027年1月。通过中粮E采供应链采购平台进行。", "winner": "", "source_url": "https://www.gc-zb.com.cn/markinfo/rMvvI1XXC9KPUT-b65U..A.html", "_computed": {"budget_wan": 95.0, "signals": []}}, {"id": "GEO-2026-022", "company": "海信集团", "industry": "家电/电子", "title": "海信集团管理品牌与营销GEO项目", "status": "已开标", "budget": "未公开", "bid_deadline": "2026-03-06", "publish_date": "2026-02-12", "summary": "海信集团控股股份有限公司管理品牌与营销GEO项目，招标编码ZB260212034。覆盖海信、东芝电视、容声、科龙、gorenje、ASKO、vidda等多品牌。包含GEO优化（KPI：各品线AI露出率平均提升30%）、GEO智能体（全链路数字化）、GEO转化承接三大板块。", "winner": "", "source_url": "https://shubo.365trade.com.cn/info-745080534.html", "_computed": {"budget_wan": null, "signals": ["🏢 多品牌覆盖", "🤖 AI智能体"]}}, {"id": "GEO-2026-023", "company": "中信建投证券", "industry": "金融/保险", "title": "GEO优化项目供应商征集", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-02-06", "publish_date": "2026-01-30", "summary": "中信建投证券GEO优化项目供应商征集。需求包括：合规内容优化（合规通过率≥95%）、多平台算法适配（核心词可见性提升80%以上）、全链路运营管控。供应商需近3年至少1个金融行业GEO/AI优化项目经验，团队不少于8人。", "winner": "", "source_url": "https://www.ygbid.com/tender/20260129165703900034.html", "_computed": {"budget_wan": null, "signals": ["🏦 金融行业"]}}, {"id": "GEO-2026-024", "company": "美团", "industry": "互联网/科技", "title": "2026年美团GEO广告采购供应商招募", "status": "已截止", "budget": "约1000万元", "bid_deadline": "2026-04-15", "publish_date": "2026-04-09", "summary": "美团2026年GEO广告采购供应商招募，合作期限2026年5月至2027年4月（年框制）。要求覆盖DeepSeek、豆包、千问、元宝、Kimi等AI平台，自研GEO优化系统语义匹配准确度≥98%，核心信息呈现率≥80%，每日每问题不少于30次监测。", "winner": "", "source_url": "https://shubo.365trade.com.cn/info-759134529.html", "_computed": {"budget_wan": 1000.0, "signals": ["📅 年框制", "💰 高预算(≥100万)"]}}, {"id": "GEO-2026-025", "company": "知乎", "industry": "互联网/科技", "title": "2026年知乎商业品牌业务GEO年框供应商招募", "status": "已截止", "budget": "200万元", "bid_deadline": "2026-04-10", "publish_date": "2026-04-01", "summary": "知乎2026年商业品牌业务GEO年框供应商招募，年度预算200万元（不承诺保底）。合作周期至2027年6月30日。要求仅允许白帽GEO（优质原创、权威信源），严格禁止批量伪原创、算法攻击、恶意投喂等行为。需提供合规承诺及操作日志。", "winner": "", "source_url": "https://gs.qianlima.com/zbcontent-586678848.html", "_computed": {"budget_wan": 200.0, "signals": ["📅 年框制", "💰 高预算(≥100万)"]}}, {"id": "GEO-2026-026", "company": "京东集团", "industry": "互联网/科技", "title": "京东集团CCO体系-公共关系部-GEO项目", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-05-15", "publish_date": "2026-05-08", "summary": "京东集团CCO体系公共关系部GEO项目，针对京东本地生活业务，在DeepSeek、Kimi、豆包、元宝等AI平台进行品牌信息占位与优化。要求注册资金≥100万，成立满2年，近2年完成3个及以上AI优化类项目，具备外卖/即时零售/生鲜电商经验优先。", "winner": "", "source_url": "http://m.ai8.com.cn/n-zb-64833468.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-027", "company": "京东五星电器", "industry": "家电/电子", "title": "京东2026-家电家居事业群（五星）全国GEO优化服务商招标", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-04-27", "publish_date": "2026-04-15", "summary": "京东家电家居事业群（五星电器）全国GEO优化服务商招标，覆盖一二三线至少39城（京东电器、京东MALL）。需求包含品牌词/行业词/对比词AI语义优化（要求TOP3）、口碑风控（负面≤5%）、大促配合等。覆盖DeepSeek、豆包、千问、Kimi、文心一言及社媒平台。", "winner": "", "source_url": "https://ln.qianlima.com/zbcontent-589816268.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-028", "company": "京东物流", "industry": "企业服务", "title": "京东物流国际官网SEO&GEO服务商招标项目", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-01-26", "publish_date": "2026-01-19", "summary": "京东物流国际官网SEO&GEO整合服务，合作周期1年。SEO以Google为主，GEO国内以DeepSeek、豆包为主，海外以ChatGPT、Gemini为主。要求文案团队需由英语及对应小语种母语人士组成，拒绝机器翻译。注：来源为微信公众号推文，原文链接无法直接访问。", "winner": "", "source_url": "", "_computed": {"budget_wan": null, "signals": ["🌐 国际GEO"]}}, {"id": "GEO-2026-029", "company": "太平洋健康险", "industry": "金融/保险", "title": "太平洋健康险2026年AI搜索优化服务（GEO）采购", "status": "已中标", "budget": "未公开", "bid_deadline": "2026-05-12", "publish_date": "2026-05-12", "summary": "太平洋健康险2026年AI搜索优化服务（GEO）采购项目，已进入中标公示阶段。太平洋健康险为中国太保旗下子公司，属于保险行业GEO采购先行者之一。注：该公告原发于招标平台，当前未找到可直接访问的原文地址。", "winner": "", "source_url": "", "_computed": {"budget_wan": null, "signals": ["🏦 金融行业"]}}, {"id": "GEO-2026-030", "company": "四川广电传媒", "industry": "互联网/科技", "title": "GEO系统技术支持服务采购项目", "status": "已截止", "budget": "15万元", "bid_deadline": "2026-04-02", "publish_date": "2026-03-30", "summary": "四川广电传媒集团有限公司GEO系统技术支持服务采购项目，采购编号ZHH-WCS-202627，预算15万元。竞争性磋商采购。采购代理为四川中汇恒工程项目管理咨询有限公司。注：项目名称中的GEO可能指生成式引擎优化或地理信息系统，需进一步确认。", "winner": "", "source_url": "http://www.sctv.com/announcement/2037447329052442625", "_computed": {"budget_wan": 15.0, "signals": []}}], "status_summary": {"已截止": 14, "已中标": 9, "招标中": 5, "已开标": 2, "已成交": 1}, "industry_distribution": {"汽车/出行": 3, "快消/食品/酒业": 3, "医药/健康": 4, "互联网/科技": 5, "建材/家居": 2, "政府/公共事业": 1, "制造业/电子": 1, "教育": 3, "企业服务": 3, "金融/保险": 4, "家电/电子": 2}};
+var INLINE_DATA = {"meta": {"name": "GEO招投标情报站", "description": "GEO（生成式引擎优化）领域真实招标、投标、中标情报追踪。每个项目均来自官方招标平台或企业官网公告。", "last_updated": "2026-05-24", "total_projects": 31, "data_sources": ["华润集团守正电子招标平台", "中国政府采购网", "各企业官网招标页面", "招标投标公共服务平台", "广州公共资源交易中心", "中粮E采供应链采购平台", "东风汽车采购招投标平台", "京东招标平台", "美团采购平台"], "note": "仅收录明确标注'GEO优化''生成式引擎优化''AI搜索优化'或实质为GEO的项目。排除地理信息(GIS)类GEO项目。"}, "projects": [{"id": "GEO-2025-001", "company": "九号公司", "industry": "汽车/出行", "title": "2025年短交通产品GEO生成式引擎优化服务供应商招标", "status": "已截止", "budget": "保证金1万元", "bid_deadline": "2025-10-15", "publish_date": "2025-09-23", "summary": "九号公司（Segway-Ninebot）就2025-2026年短交通产品线GEO生成式引擎优化服务进行招标。要求供应商成立≥3年、注册资金≥100万、社保≥10人、年度营业额≥300万，具有3个以上同行业头部客户成功案例。服务期至2026年4月。", "winner": "", "source_url": "https://www.ygbid.com/tender/20250923203620200003.html", "_computed": {"budget_wan": 1.0, "signals": []}}, {"id": "GEO-2025-003", "company": "华润饮料（怡宝）", "industry": "快消/食品/酒业", "title": "华润饮料2025-2026年企业品牌优化第三方服务项目（含GEO/SEO）", "status": "已截止", "budget": "未公开", "bid_deadline": "2025-05-12", "publish_date": "2025-05-07", "summary": "华润怡宝（华润饮料）2025-2026年企业品牌优化第三方服务项目，包含搜索引擎内容引擎优化（GEO/SEO）、百科优化等。要求百度百科词条搭建更新、新闻稿件≥80篇、问答平台内容≥40组，覆盖品牌词及行业词优化。", "winner": "", "source_url": "https://www.ygbid.com/tender/20250507160004900002.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-001", "company": "东阿阿胶（华润集团）", "industry": "医药/健康", "title": "2026年东阿阿胶GEO优化项目询比采购", "status": "已中标", "budget": "未公开", "bid_deadline": "2026-03-19", "publish_date": "2026-03-11", "summary": "华润集团旗下东阿阿胶2026年GEO优化项目。成交供应商为秒针信息技术有限公司和福建新升代数字技术有限公司。属于华润系企业第二批GEO集中采购，覆盖品牌在主流AI平台的可见度优化。", "winner": "秒针信息技术有限公司、福建新升代数字技术有限公司", "source_url": "https://szecp.crc.com.cn/zbxx/006002/006002003/20260403/YYCJGG202603310003.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-002", "company": "昆药集团（华润旗下）", "industry": "医药/健康", "title": "GEO AI搜索引擎优化采购项目", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-02-06", "publish_date": "2026-02-02", "summary": "华润旗下昆药集团GEO AI搜索引擎优化服务采购，为华润系企业首批GEO优化项目之一。采购编号SJCGXY202602020002。", "winner": "", "source_url": "https://szecp.crc.com.cn/zbxx/006002/006002001/20260202/SJXYGG202602020002.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-003", "company": "扬子江药业集团", "industry": "医药/健康", "title": "2026年品牌宣传部GEO项目", "status": "招标中", "budget": "未公开", "bid_deadline": "2026-04-27", "publish_date": "2026-04-20", "summary": "扬子江药业集团品牌宣传部2026年GEO项目招标，服务地点北京朝阳区，服务周期半年。进行相关词条的GEO优化，提升品牌在AI搜索引擎中的可见度。来源：扬子江药业集团官网招标页面。", "winner": "", "source_url": "https://www.yangzijiang.com/Bidding/4396.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-004", "company": "天翼云", "industry": "互联网/科技", "title": "2026年官网GEO优化服务采购项目", "status": "已中标", "budget": "106.5万元", "bid_deadline": "2026-03-20", "publish_date": "2026-03-10", "summary": "天翼云2026年官网GEO优化服务采购，第一中标候选人为北京鲲鹏伟业广告有限公司，投标报价1,065,000元（不含增值税）。招标代理为中捷通信有限公司。", "winner": "北京鲲鹏伟业广告有限公司", "source_url": "https://bj.zhiliaobiaoxun.com/article/91704077", "_computed": {"budget_wan": 106.5, "signals": ["💰 高预算(≥100万)"]}}, {"id": "GEO-2026-005", "company": "新明珠集团（冠珠瓷砖）", "industry": "建材/家居", "title": "冠珠瓷砖2026年GEO优化项目", "status": "招标中", "budget": "30万元", "bid_deadline": "2026-05-24", "publish_date": "2026-05-10", "summary": "新明珠集团旗下冠珠瓷砖年度GEO优化项目，预算30万元（含税），服务周期一年。需求包括品牌知识库构建、技术内容优化、AI舆情监控等，要求覆盖主流AI平台。", "winner": "", "source_url": "https://gs.qianlima.com/zbcontent-597667495.html", "_computed": {"budget_wan": 30.0, "signals": []}}, {"id": "GEO-2026-006", "company": "东鹏控股", "industry": "建材/家居", "title": "innoci外贸独立站建设及GEO优化项目", "status": "已截止", "budget": "保证金3万元", "bid_deadline": "2026-04-23", "publish_date": "2026-04-09", "summary": "东鹏控股innoci外贸独立站建设及GEO优化项目投标邀请，招标编号2026DPCG-39。含外贸独立站建设与GEO优化双重需求。", "winner": "", "source_url": "http://www.ygbid.com/tender/20260409092926900001.html", "_computed": {"budget_wan": 3.0, "signals": []}}, {"id": "GEO-2026-007", "company": "宁波市北仑区旅游发展服务中心", "industry": "政府/公共事业", "title": "梅山湾旅游度假区2026年度线上平台全矩阵运维采购", "status": "已开标", "budget": "50万元", "bid_deadline": "2026-04-24", "publish_date": "2026-04-03", "summary": "宁波北仑区政府采购项目，预算50万元。包含内容采编、AI客服、网站运维及GEO（生成式搜索引擎）优化。服务期2026年5月至2027年5月。政采云公开招标。标志着GEO正式进入政府采购体系。", "winner": "", "source_url": "https://zfcg.czj.ningbo.gov.cn/project/zcyNotice_view.aspx?Id=202604031716152039995385371561984", "_computed": {"budget_wan": 50.0, "signals": ["🏛 政府采购", "🎓 公共采购"]}}, {"id": "GEO-2026-008", "company": "中航电测仪器（西安）有限公司", "industry": "制造业/电子", "title": "GEO生成式引擎优化询价采购", "status": "招标中", "budget": "未公开", "bid_deadline": "2026-05-31", "publish_date": "2026-05-13", "summary": "中航电测仪器（西安）有限公司就GEO生成式引擎优化服务进行询价采购，数量1套。中航工业体系内企业开始布局GEO优化。", "winner": "", "source_url": "http://www.yfbzb.com/inviteBid/detail/20260513_596834322.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-009", "company": "和君职业学院", "industry": "教育", "title": "生成式AI搜索引擎GEO优化服务项目", "status": "已中标", "budget": "8万元", "bid_deadline": "2026-05-20", "publish_date": "2026-05-15", "summary": "和君职业学院招生办GEO优化服务项目，单一来源采购，成交金额8万元。要求覆盖DeepSeek、豆包、文心一言、通义千问等4个平台共60个优化任务，品牌正向率≥80%。成交供应商为芜湖小象园教育科技有限公司。", "winner": "芜湖小象园教育科技有限公司", "source_url": "https://www.hejuncollege.com/tzgg/14378.html", "_computed": {"budget_wan": 8.0, "signals": ["🎓 公共采购"]}}, {"id": "GEO-2026-010", "company": "南昌航空大学科技学院", "industry": "教育", "title": "2026年招生宣传AI大模型词条优化服务采购", "status": "招标中", "budget": "4万元", "bid_deadline": "2026-05-29", "publish_date": "2026-05-22", "summary": "南昌航空大学科技学院AI大模型词条优化服务采购，预算4万元。需覆盖豆包、DeepSeek、文心一言、通义千问、Kimi、腾讯元宝等主流AI平台，提升品牌提及率和词条触发成功率。", "winner": "", "source_url": "http://www.yfbzb.com/inviteBid/detail/20260522_599259155.html", "_computed": {"budget_wan": 4.0, "signals": ["🎓 公共采购"]}}, {"id": "GEO-2026-011", "company": "浙东数字经济产业园运营中心", "industry": "企业服务", "title": "GEO优化智能获客系统采购项目", "status": "已中标", "budget": "68.9万元", "bid_deadline": "2026-05-06", "publish_date": "2026-04-25", "summary": "浙东数字经济产业园运营中心GEO优化智能获客系统采购，竞争性谈判，中标金额68.9万元。含系统部署、地域标签配置、客流分析、区域投放优化、客户画像、数据看板及1年质保运维。", "winner": "武汉市仙念仙信息科技有限公司", "source_url": "http://www.zgggzy.com/jieguo/show.php?itemid=100000", "_computed": {"budget_wan": 68.9, "signals": ["🤖 AI智能体"]}}, {"id": "GEO-2026-012", "company": "奇瑞汽车", "industry": "汽车/出行", "title": "2025年奇瑞营销产品SEO、GEO优化代理招标项目", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-01-20", "publish_date": "2026-01-14", "summary": "奇瑞汽车2025年营销产品SEO、GEO优化代理招标，采购编号CGXM-202601-0486。招标方为瑞鲸（安徽）供应链科技有限公司。2026年3月发布变更公告。", "winner": "", "source_url": "https://ebd.mychery.com/en/zd20=jsgcbg/20260310/1216064709006983168.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-013", "company": "易招标（招采进宝）", "industry": "企业服务", "title": "GEO优化服务采购项目", "status": "已中标", "budget": "含激励机制", "bid_deadline": "2026-04-23", "publish_date": "2026-04-16", "summary": "易招标平台自身就GEO优化服务进行采购，服务期至少90天，包含激励机制。招标采购平台自身采购GEO服务，体现了行业对GEO的认可。", "winner": "", "source_url": "https://china.zcjb.com.cn/cms/china/webfile/detail/index.html?contentId=1229839006590566400", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-014", "company": "广州白云山医药集团", "industry": "医药/健康", "title": "系列产品官网制作搭建（含SEO&GEO）", "status": "招标中", "budget": "35万元", "bid_deadline": "2026-05-15", "publish_date": "2026-04-20", "summary": "广州白云山制药总厂系列产品官网制作搭建项目，明确包含SEO和GEO优化需求，预算35万元。官网建设+AI搜索优化一体化采购。", "winner": "", "source_url": "http://ygcg.gzggzy.cn/m92/fw/20260429/391578.html", "_computed": {"budget_wan": 35.0, "signals": []}}, {"id": "GEO-2026-015", "company": "阿坝师范学院", "industry": "教育", "title": "2026年招生宣传AI优化呈现服务采购", "status": "已中标", "budget": "4.5万元", "bid_deadline": "2026-05-07", "publish_date": "2026-04-28", "summary": "阿坝师范学院2026年招生宣传AI优化呈现服务询价采购，预算4.5万元。要求在主流AI平台（豆包、DeepSeek、文心一言等）优化招生宣传信息展示。", "winner": "", "source_url": "https://jw.abtu.edu.cn/info/1131/5141.htm", "_computed": {"budget_wan": 4.5, "signals": ["🎓 公共采购"]}}, {"id": "GEO-2026-017", "company": "东风本田", "industry": "汽车/出行", "title": "东风Honda 2026年GEO项目（生成式引擎优化）", "status": "已中标", "budget": "约120.7万元", "bid_deadline": "2025-03-16", "publish_date": "2025-02-13", "summary": "东风本田2026年GEO项目，在DeepSeek、Kimi、元宝、豆包、文心一言、通义千问等6个AI平台中针对预设问题持续推荐指定车型。要求维持至少1年推荐效果。中标方为新智科技发展有限公司，中标金额约120.7万元（1,207,128元）。", "winner": "新智科技发展有限公司", "source_url": "https://hub.zhiliaobiaoxun.com/article/94001908", "_computed": {"budget_wan": 120.7, "signals": ["💰 高预算(≥100万)"]}}, {"id": "GEO-2026-018", "company": "广汽汇理租赁", "industry": "金融/保险", "title": "广汽汇理租赁品牌公关传播及GEO服务项目", "status": "已中标", "budget": "180万元", "bid_deadline": "2026-04-30", "publish_date": "2026-04-09", "summary": "广州广汽汇理融资租赁有限公司品牌公关传播及GEO服务项目，采购控制价180万元（总价包干）。第一中标候选人北京智慧星光信息技术股份有限公司（160万元），第二北京艾信博睿管理顾问有限公司（142.8万元），第三北京新智科技发展有限公司（146万元）。服务期两年。", "winner": "北京智慧星光信息技术股份有限公司", "source_url": "https://ygcg.gzggzy.cn/p92/fw3/20260507/393930.html", "_computed": {"budget_wan": 180.0, "signals": ["🏦 金融行业", "💰 高预算(≥100万)"]}}, {"id": "GEO-2026-019", "company": "中英人寿", "industry": "金融/保险", "title": "2026年中英人寿GEO（AI搜索引擎优化）项目", "status": "已中标", "budget": "未公开", "bid_deadline": "2026-04-01", "publish_date": "2026-04-02", "summary": "中英人寿2026年GEO（AI搜索引擎优化）项目，采购方式为谈判采购（分散）。成交供应商为数说故事人工智能科技股份有限公司。属于保险行业较早启动GEO采购的项目之一。", "winner": "数说故事人工智能科技股份有限公司", "source_url": "https://beijing.zhaobiao.cn/succeed_v_02ff8ee34ccd4f7874f6b9ca1691768d.html", "_computed": {"budget_wan": null, "signals": ["🏦 金融行业"]}}, {"id": "GEO-2026-020", "company": "五粮液", "industry": "快消/食品/酒业", "title": "AI平台内容优化项目（GEO生成式引擎优化）", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-01-29", "publish_date": "2026-01-09", "summary": "四川五粮液浓香酒有限公司AI平台内容优化项目（实质为GEO），项目编号五粮液浓香招﹝2025﹞154号。要求在DeepSeek、豆包、元宝等主流AI平台进行品牌内容优化。服务期2026年1月至12月。五粮液电子招投标平台发布，需CFCA证书参与。", "winner": "", "source_url": "https://www.chinabidding.cn/zbgg/U-vzwzYjW.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-021", "company": "中粮肉食", "industry": "快消/食品/酒业", "title": "2026年口碑舆情监测及SEO、GEO优化项目", "status": "已截止", "budget": "95万元", "bid_deadline": "2026-02-04", "publish_date": "2026-01-30", "summary": "中粮肉食投资有限公司2026年口碑舆情监测及SEO、GEO优化项目，最高限价95万元（含税）。项目编号GN2026-44-0706。采购代理为安徽省招标集团股份有限公司。服务期2026年2月至2027年1月。通过中粮E采供应链采购平台进行。", "winner": "", "source_url": "https://www.gc-zb.com.cn/markinfo/rMvvI1XXC9KPUT-b65U..A.html", "_computed": {"budget_wan": 95.0, "signals": []}}, {"id": "GEO-2026-022", "company": "海信集团", "industry": "家电/电子", "title": "海信集团管理品牌与营销GEO项目", "status": "已开标", "budget": "未公开", "bid_deadline": "2026-03-06", "publish_date": "2026-02-12", "summary": "海信集团控股股份有限公司管理品牌与营销GEO项目，招标编码ZB260212034。覆盖海信、东芝电视、容声、科龙、gorenje、ASKO、vidda等多品牌。包含GEO优化（KPI：各品线AI露出率平均提升30%）、GEO智能体（全链路数字化）、GEO转化承接三大板块。", "winner": "", "source_url": "https://shubo.365trade.com.cn/info-745080534.html", "_computed": {"budget_wan": null, "signals": ["🏢 多品牌覆盖", "🤖 AI智能体"]}}, {"id": "GEO-2026-023", "company": "中信建投证券", "industry": "金融/保险", "title": "GEO优化项目供应商征集", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-02-06", "publish_date": "2026-01-30", "summary": "中信建投证券GEO优化项目供应商征集。需求包括：合规内容优化（合规通过率≥95%）、多平台算法适配（核心词可见性提升80%以上）、全链路运营管控。供应商需近3年至少1个金融行业GEO/AI优化项目经验，团队不少于8人。", "winner": "", "source_url": "https://www.ygbid.com/tender/20260129165703900034.html", "_computed": {"budget_wan": null, "signals": ["🏦 金融行业"]}}, {"id": "GEO-2026-024", "company": "美团", "industry": "互联网/科技", "title": "2026年美团GEO广告采购供应商招募", "status": "已截止", "budget": "约1000万元", "bid_deadline": "2026-04-15", "publish_date": "2026-04-09", "summary": "美团2026年GEO广告采购供应商招募，合作期限2026年5月至2027年4月（年框制）。要求覆盖DeepSeek、豆包、千问、元宝、Kimi等AI平台，自研GEO优化系统语义匹配准确度≥98%，核心信息呈现率≥80%，每日每问题不少于30次监测。", "winner": "", "source_url": "https://shubo.365trade.com.cn/info-759134529.html", "_computed": {"budget_wan": 1000.0, "signals": ["📅 年框制", "💰 高预算(≥100万)"]}}, {"id": "GEO-2026-025", "company": "知乎", "industry": "互联网/科技", "title": "2026年知乎商业品牌业务GEO年框供应商招募", "status": "已截止", "budget": "200万元", "bid_deadline": "2026-04-10", "publish_date": "2026-04-01", "summary": "知乎2026年商业品牌业务GEO年框供应商招募，年度预算200万元（不承诺保底）。合作周期至2027年6月30日。要求仅允许白帽GEO（优质原创、权威信源），严格禁止批量伪原创、算法攻击、恶意投喂等行为。需提供合规承诺及操作日志。", "winner": "", "source_url": "https://gs.qianlima.com/zbcontent-586678848.html", "_computed": {"budget_wan": 200.0, "signals": ["📅 年框制", "💰 高预算(≥100万)"]}}, {"id": "GEO-2026-026", "company": "京东集团", "industry": "互联网/科技", "title": "京东集团CCO体系-公共关系部-GEO项目", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-05-15", "publish_date": "2026-05-08", "summary": "京东集团CCO体系公共关系部GEO项目，针对京东本地生活业务，在DeepSeek、Kimi、豆包、元宝等AI平台进行品牌信息占位与优化。要求注册资金≥100万，成立满2年，近2年完成3个及以上AI优化类项目，具备外卖/即时零售/生鲜电商经验优先。", "winner": "", "source_url": "http://m.ai8.com.cn/n-zb-64833468.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-027", "company": "京东五星电器", "industry": "家电/电子", "title": "京东2026-家电家居事业群（五星）全国GEO优化服务商招标", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-04-27", "publish_date": "2026-04-15", "summary": "京东家电家居事业群（五星电器）全国GEO优化服务商招标，覆盖一二三线至少39城（京东电器、京东MALL）。需求包含品牌词/行业词/对比词AI语义优化（要求TOP3）、口碑风控（负面≤5%）、大促配合等。覆盖DeepSeek、豆包、千问、Kimi、文心一言及社媒平台。", "winner": "", "source_url": "https://ln.qianlima.com/zbcontent-589816268.html", "_computed": {"budget_wan": null, "signals": []}}, {"id": "GEO-2026-028", "company": "京东物流", "industry": "企业服务", "title": "京东物流国际官网SEO&GEO服务商招标项目", "status": "已截止", "budget": "未公开", "bid_deadline": "2026-01-26", "publish_date": "2026-01-19", "summary": "京东物流国际官网SEO&GEO整合服务，合作周期1年。SEO以Google为主，GEO国内以DeepSeek、豆包为主，海外以ChatGPT、Gemini为主。要求文案团队需由英语及对应小语种母语人士组成，拒绝机器翻译。注：来源为微信公众号推文，原文链接无法直接访问。", "winner": "", "source_url": "", "_computed": {"budget_wan": null, "signals": ["🌐 国际GEO"]}}, {"id": "GEO-2026-029", "company": "太平洋健康险", "industry": "金融/保险", "title": "太平洋健康险2026年AI搜索优化服务（GEO）采购", "status": "已中标", "budget": "未公开", "bid_deadline": "2026-05-12", "publish_date": "2026-05-12", "summary": "太平洋健康险2026年AI搜索优化服务（GEO）采购项目，已进入中标公示阶段。太平洋健康险为中国太保旗下子公司，属于保险行业GEO采购先行者之一。注：该公告原发于招标平台，当前未找到可直接访问的原文地址。", "winner": "", "source_url": "", "_computed": {"budget_wan": null, "signals": ["🏦 金融行业"]}}, {"id": "GEO-2026-030", "company": "四川广电传媒", "industry": "互联网/科技", "title": "GEO系统技术支持服务采购项目", "status": "已截止", "budget": "15万元", "bid_deadline": "2026-04-02", "publish_date": "2026-03-30", "summary": "四川广电传媒集团有限公司GEO系统技术支持服务采购项目，采购编号ZHH-WCS-202627，预算15万元。竞争性磋商采购。采购代理为四川中汇恒工程项目管理咨询有限公司。注：项目名称中的GEO可能指生成式引擎优化或地理信息系统，需进一步确认。", "winner": "", "source_url": "http://www.sctv.com/announcement/2037447329052442625", "_computed": {"budget_wan": 15.0, "signals": []}}], "status_summary": {"已截止": 14, "已中标": 10, "招标中": 5, "已开标": 2}, "industry_distribution": {"汽车/出行": 3, "快消/食品/酒业": 3, "医药/健康": 4, "互联网/科技": 5, "建材/家居": 2, "政府/公共事业": 1, "制造业/电子": 1, "教育": 3, "企业服务": 3, "金融/保险": 4, "家电/电子": 2}};
 </script>
 
 <script>
@@ -333,7 +374,7 @@ function extractSourceName(url) {
     'beijing.zhaobiao.cn': '北京招标网', 'gc-zb.com.cn': '国采招标平台',
     'ai8.com.cn': '中国能源招标网', 'sctv.com': '四川广播电视台官网',
     'chinabidding.cn': '中国采购与招标网', 'chinabidding.com.cn': '中国采购与招标网',
-    'zhiliaobiaoxun.com': '智了标讯', 'shubo.365trade.com.cn': '硕博招标平台',
+    'zhiliaobiaoxun.com': '智了标讯', 'hub.zhiliaobiaoxun.com': '智了标讯', 'shubo.365trade.com.cn': '硕博招标平台',
   };
   // exact match
   if (map[domain]) return map[domain];
@@ -353,7 +394,7 @@ function startApp() {
 }
 
 function statusTag(status) {
-  var map = { '招标中': 'tag-bidding', '已中标': 'tag-awarded', '已成交': 'tag-completed', '已截止': 'tag-info', '已开标': 'tag-awarded', '采购意向': 'tag-info', '情报收集': 'tag-info' };
+  var map = { '招标中': 'tag-bidding', '已中标': 'tag-awarded', '已截止': 'tag-info', '已开标': 'tag-awarded', '采购意向': 'tag-info', '情报收集': 'tag-info' };
   return '<span class="tag ' + (map[status] || 'tag-info') + '">' + status + '</span>';
 }
 
@@ -361,7 +402,7 @@ function statusTag(status) {
 function renderStats() {
   var stats = data.status_summary;
   var active = stats['招标中'] || 0;
-  var awarded = (stats['已中标']||0) + (stats['已成交']||0);
+  var awarded = (stats['已中标']||0);
   var total = data.projects.length;
   var industries = Object.keys(data.industry_distribution).length;
   var totalBudget = 0, budgetCount = 0, maxBudget = 0;
@@ -372,7 +413,7 @@ function renderStats() {
   var cards = [
     { label: '项目总数', num: total, cls: 'blue' },
     { label: '招标中', num: active, cls: 'orange' },
-    { label: '已中标/成交', num: awarded, cls: 'green' },
+    { label: '已中标', num: awarded, cls: 'green' },
     { label: '覆盖行业', num: industries, cls: 'purple' }
   ];
   if (budgetCount > 0) {
@@ -381,9 +422,29 @@ function renderStats() {
   }
   var html = '';
   for (var i = 0; i < cards.length; i++) {
-    html += '<div class="stat-card ' + cards[i].cls + '"><div class="num">' + cards[i].num + '</div><div class="label">' + cards[i].label + '</div></div>';
+    var c = cards[i];
+    var filter = c.label === '项目总数' ? 'all' : c.label === '招标中' ? '招标中' : c.label === '已中标' ? '已中标' : c.label === '覆盖行业' ? 'industry' : 'budget';
+    html += '<div class="stat-card ' + c.cls + '" data-filter="' + filter + '" style="cursor:pointer"><div class="num">' + c.num + '</div><div class="label">' + c.label + '</div></div>';
   }
   document.getElementById('stats').innerHTML = html;
+  // stat card click - event delegation
+  document.getElementById('stats').onclick = function(e) {
+    var card = e.target.closest('.stat-card');
+    if (!card) return;
+    var filter = card.getAttribute('data-filter');
+    if (filter === 'industry' || filter === 'budget') {
+      switchTab('trends');
+      return;
+    }
+    switchTab('browse');
+    document.getElementById('searchInput').value = '';
+    if (filter === 'all') {
+      document.getElementById('statusFilter').value = 'all';
+    } else {
+      document.getElementById('statusFilter').value = filter;
+    }
+    filterProjects();
+  };
   document.getElementById('projectCount').textContent = '共 ' + total + ' 个项目';
   document.getElementById('updateInfo').textContent = '最后更新：' + data.meta.last_updated + ' | ' + data.meta.data_sources.length + ' 个数据来源';
 }
@@ -395,11 +456,14 @@ function renderFilters() {
     var s = data.projects[i].status;
     statusCounts[s] = (statusCounts[s] || 0) + 1;
   }
-  var statusOrder = ['招标中', '已开标', '已中标', '已成交', '已截止', '采购意向', '情报收集'];
+  var statusOrder = ['招标中', '已开标', '已中标', '已截止', '采购意向', '情报收集'];
   var html = '<option value="all">全部状态</option>';
   for (var si = 0; si < statusOrder.length; si++) {
     var s = statusOrder[si];
     if (statusCounts[s]) html += '<option value="' + s + '">' + s + ' (' + statusCounts[s] + ')</option>';
+  }
+  for (var es in extraStatuses) {
+    html += '<option value="' + es + '">' + extraStatuses[es] + '</option>';
   }
   statusSel.innerHTML = html;
 
@@ -432,7 +496,7 @@ function filterProjects() {
     filtered.push(p);
   }
 
-  var statusOrder = { '招标中': 0, '已开标': 1, '已中标': 2, '已成交': 3, '已截止': 4, '采购意向': 5, '情报收集': 6 };
+  var statusOrder = { '招标中': 0, '已开标': 1, '已中标': 2, '已截止': 3, '采购意向': 4, '情报收集': 5 };
   filtered.sort(function(a, b) {
     var oa = statusOrder[a.status] !== undefined ? statusOrder[a.status] : 99;
     var ob = statusOrder[b.status] !== undefined ? statusOrder[b.status] : 99;
@@ -468,7 +532,7 @@ function filterProjects() {
     var p = filtered[i];
     var c = p._computed;
 
-    html += '<div class="project">';
+    html += '<div class="project" onclick=\'showProject("' + p.id + '")\' style="cursor:pointer">';
     html += '<div class="top"><div>';
     html += '<div class="company">' + p.company + ' ' + statusTag(p.status) + '</div>';
     html += '<span class="industry-tag">' + p.industry + '</span>';
@@ -487,7 +551,7 @@ function filterProjects() {
     if (p.winner) html += '<div class="winner-line">🏆 中标方：' + p.winner + '</div>';
     if (p.source_url) {
       var source = extractSourceName(p.source_url);
-      html += '<div class="link"><a href="' + p.source_url + '" target="_blank" rel="noopener">查看原文</a><span class="source-domain">' + source + '</span></div>';
+      html += '<div class="link"><a href="' + p.source_url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">查看原文</a><span class="source-domain">' + source + '</span></div>';
     }
     html += '</div>';
   }
@@ -815,7 +879,7 @@ function getIndustryStats(industry) {
   var minBudget = budgetWan.length > 0 ? Math.min.apply(null, budgetWan) : 0;
   var maxBudget = budgetWan.length > 0 ? Math.max.apply(null, budgetWan) : 0;
   var openCount = projs.filter(function(p) { return p.status === '招标中' || p.status === '已开标'; }).length;
-  var awardedCount = projs.filter(function(p) { return p.status === '已中标' || p.status === '已成交'; }).length;
+  var awardedCount = projs.filter(function(p) { return p.status === '已中标'; }).length;
   var winners = projs.filter(function(p) { return p.winner; });
   var topWinners = {};
   for (var i = 0; i < winners.length; i++) {
@@ -1022,32 +1086,28 @@ function generateIntelligence(result) {
   return parts.join('\n\n');
 }
 
-function formatAnalysisReport(result) {
-  var similar = matchExistingProjects(result.raw, result.client, result.industry);
+function buildReportBody(r, similar) {
   var signalsHtml = '';
-  for (var i = 0; i < result.signals.length; i++) signalsHtml += '<span class="signal-tag">' + result.signals[i] + '</span>';
+  if (r.signals && r.signals.length > 0) {
+    for (var i = 0; i < r.signals.length; i++) signalsHtml += '<span class="signal-tag">' + r.signals[i] + '</span>';
+  }
 
-  var intelligence = generateIntelligence(result);
-  var html = '<div class="analysis-report">';
-  html += '<div class="report-header"><h3 style="margin:0 0 4px 0;font-size:16px">GEO情报分析报告</h3>';
-  html += '<span style="font-size:12px;color:#999">' + result.created + ' 生成</span></div>';
-
-  html += '<div class="report-section"><div class="report-section-title">📋 基本信息</div><table class="report-table">';
-  html += '<tr><td class="rl">甲方/采购方</td><td class="rv editable" contenteditable="true">' + (result.client || '待确认') + '</td></tr>';
-  html += '<tr><td class="rl">项目名称</td><td class="rv editable" contenteditable="true">' + (result.title || '待确认') + '</td></tr>';
-  html += '<tr><td class="rl">预算金额</td><td class="rv editable" contenteditable="true">' + (result.budget || '未公开') + '</td></tr>';
-  html += '<tr><td class="rl">所属行业</td><td class="rv"><span class="industry-tag" style="background:#e8eaf6;color:#302b63">' + result.industry + '</span></td></tr>';
-  if (result.deadline) html += '<tr><td class="rl">截止日期</td><td class="rv">' + result.deadline + '</td></tr>';
-  if (result.winner) html += '<tr><td class="rl">中标方</td><td class="rv editable" contenteditable="true" style="color:#c0392b;font-weight:600">' + result.winner + '</td></tr>';
-  if (result.biddingId) html += '<tr><td class="rl">招标编号</td><td class="rv">' + result.biddingId + '</td></tr>';
-  if (result.servicePeriod) html += '<tr><td class="rl">服务期限</td><td class="rv editable" contenteditable="true">' + result.servicePeriod + '</td></tr>';
+  var html = '<div class="report-section"><div class="report-section-title">📋 基本信息</div><table class="report-table">';
+  html += '<tr><td class="rl">甲方/采购方</td><td class="rv editable" contenteditable="true">' + (r.client || '待确认') + '</td></tr>';
+  html += '<tr><td class="rl">项目名称</td><td class="rv editable" contenteditable="true">' + (r.title || '待确认') + '</td></tr>';
+  html += '<tr><td class="rl">预算金额</td><td class="rv editable" contenteditable="true">' + (r.budget || '未公开') + '</td></tr>';
+  html += '<tr><td class="rl">所属行业</td><td class="rv"><span class="industry-tag" style="background:#e8eaf6;color:#302b63">' + r.industry + '</span></td></tr>';
+  if (r.deadline) html += '<tr><td class="rl">截止日期</td><td class="rv">' + r.deadline + '</td></tr>';
+  if (r.winner) html += '<tr><td class="rl">中标方</td><td class="rv editable" contenteditable="true" style="color:#c0392b;font-weight:600">' + r.winner + '</td></tr>';
+  if (r.biddingId) html += '<tr><td class="rl">招标编号</td><td class="rv">' + r.biddingId + '</td></tr>';
+  if (r.servicePeriod) html += '<tr><td class="rl">服务期限</td><td class="rv editable" contenteditable="true">' + r.servicePeriod + '</td></tr>';
   html += '</table></div>';
 
   if (signalsHtml) {
     html += '<div class="report-section"><div class="report-section-title">🔍 趋势信号</div><div style="display:flex;flex-wrap:wrap;gap:6px">' + signalsHtml + '</div></div>';
   }
 
-  if (similar.length > 0) {
+  if (similar && similar.length > 0) {
     html += '<div class="report-section"><div class="report-section-title">📊 行业对标</div>';
     html += '<div style="font-size:12px;color:#999;margin-bottom:8px">已收录的同行业/同类型项目（按匹配度排序）：</div>';
     html += '<table class="report-table"><tr><td class="rl" style="color:#666;font-size:12px">甲方</td><td class="rl" style="color:#666;font-size:12px">金额</td><td class="rl" style="color:#666;font-size:12px">状态</td><td class="rl" style="color:#666;font-size:12px">中标方</td></tr>';
@@ -1059,17 +1119,25 @@ function formatAnalysisReport(result) {
   }
 
   html += '<div class="report-section"><div class="report-section-title">📈 市场分析</div>';
-  html += '<div style="padding:12px;background:#fafafa;border-radius:8px;font-size:13px;line-height:1.9;color:#333;white-space:pre-wrap">' + intelligence + '</div></div>';
+  html += '<div style="padding:12px;background:#fafafa;border-radius:8px;font-size:13px;line-height:1.9;color:#333;white-space:pre-wrap">' + generateIntelligence(r) + '</div></div>';
 
+  return html;
+}
+
+function formatAnalysisReport(result) {
+  var similar = matchExistingProjects(result.raw, result.client, result.industry);
+  var html = '<div class="analysis-report">';
+  html += '<div class="report-header"><h3 style="margin:0 0 4px 0;font-size:16px">GEO情报分析报告</h3>';
+  html += '<span style="font-size:12px;color:#999">' + result.created + ' 生成</span></div>';
+  html += buildReportBody(result, similar);
   html += '<div class="report-section"><div class="report-section-title">💡 情报解读（可编辑）</div>';
-  html += '<div contenteditable="true" style="min-height:80px;padding:12px;border:1px solid #e0e0e0;border-radius:8px;font-size:13px;line-height:1.8;color:#333;background:#fafafa;outline:none" id="analysisNotes">' + (result.notes || '可在此补充你的分析洞察或根据最新信息修正上述分析...') + '</div></div>';
-
+  html += '<div contenteditable="true" id="analysisNotes" style="min-height:80px;padding:12px;border:1px solid #e0e0e0;border-radius:8px;font-size:13px;line-height:1.8;color:#333;background:#fafafa;outline:none">' + (result.notes || '可在此补充你的分析洞察或根据最新信息修正上述分析...') + '</div></div>';
   html += '<div class="analysis-actions" style="margin-top:16px">';
   html += '<button class="btn-primary" onclick="saveAnalysis()">💾 保存记录</button>';
   html += '<button class="btn-secondary" onclick="copyAnalysisText()">📋 复制报告</button>';
   html += '<button class="btn-secondary" onclick="downloadPdf()">📥 下载PDF</button>';
+  html += '<button class="btn-secondary" onclick="printAnalysis()">🖨️ 打印</button>';
   html += '</div></div>';
-
   return html;
 }
 
@@ -1148,11 +1216,92 @@ function copyAnalysisText() {
   navigator.clipboard.writeText(t).then(function() { alert('报告已复制到剪贴板\n可直接粘贴到微信、飞书、邮件等'); });
 }
 
-function printAnalysis() {
+function downloadPdf() {
   var r = getResultFields();
   if (!r) return;
-  var fileName = (r.client || 'GEO') + '_GEO情报分析报告';
+
+  var dlBtn = document.querySelector('.analysis-actions .btn-primary');
+  var origText = dlBtn ? dlBtn.textContent : '';
+  if (dlBtn) dlBtn.textContent = '⏳ 生成PDF...';
+
+  var doPdf = function() {
+    try {
+      var similar = matchExistingProjects(r.raw || '', r.client, r.industry);
+      var client = r.client || 'GEO';
+      var fileName = client + '_GEO情报分析报告';
+
+      // Use shared buildReportBody (same content as on-page report)
+      var bodyHtml = buildReportBody(r, similar);
+
+      // Notes section (only if user entered content)
+      var notesHtml = '';
+      if (r.notes && r.notes !== '可在此补充你的分析洞察或根据最新信息修正上述分析...') {
+        notesHtml = '<div class="report-section"><div class="report-section-title">💡 情报解读</div>';
+        notesHtml += '<div style="padding:12px;border:1px solid #e0e0e0;border-radius:8px;font-size:13px;line-height:1.8;color:#333;background:#fafafa">' + r.notes.replace(/\n/g,'<br>') + '</div></div>';
+      }
+
+      var div = document.getElementById('_pdf_render');
+      if (!div) {
+        div = document.createElement('div');
+        div.id = '_pdf_render';
+        div.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;background:#fff;padding:40px;z-index:-1';
+        document.body.appendChild(div);
+      }
+      div.innerHTML =
+        '<h1 style="font-size:24px;text-align:center;border-bottom:2px solid #302b63;padding-bottom:12px;margin-bottom:20px;color:#1a1a2e">GEO情报分析报告</h1>' +
+        bodyHtml + notesHtml +
+        '<div style="text-align:center;color:#999;font-size:12px;margin-top:40px;border-top:1px solid #eee;padding-top:12px">生成日期：' + (r.created||'') + ' | 来源：GEO招投标情报站</div>';
+
+      html2pdf().set({
+        margin: [15, 15],
+        filename: fileName + '.pdf',
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(div).outputPdf('bloburl').then(function(blobUrl) {
+        if (dlBtn) dlBtn.textContent = '✅ 完成';
+        // Direct download link (works on mobile — no window.open)
+        var a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = fileName + '.pdf';
+        a.style.cssText = 'position:fixed;bottom:20px;right:20px;padding:14px 28px;background:#302b63;color:#fff;border-radius:8px;text-decoration:none;font-size:16px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3)';
+        a.textContent = '📥 点击下载PDF';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() { if (a.parentNode) a.parentNode.removeChild(a); }, 30000);
+        setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 120000);
+        setTimeout(function() { if (dlBtn) dlBtn.textContent = origText; }, 3000);
+      }).catch(function() {
+        if (dlBtn) dlBtn.textContent = '❌ 生成失败';
+        showPrintFallback(bodyHtml + notesHtml, fileName, r.created);
+        setTimeout(function() { if (dlBtn) dlBtn.textContent = origText; }, 3000);
+      });
+    } catch (e) {
+      if (dlBtn) dlBtn.textContent = '❌ 错误';
+      showPrintFallback('', (r&&r.client||'GEO') + '_GEO情报分析报告', r&&r.created||'');
+      setTimeout(function() { if (dlBtn) dlBtn.textContent = origText; }, 3000);
+    }
+  };
+
+  if (typeof html2pdf === 'undefined') {
+    var script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    script.onload = doPdf;
+    script.onerror = function() {
+      if (dlBtn) dlBtn.textContent = '⚠️ 使用打印模式...';
+      showPrintFallback('', (r.client||'GEO') + '_GEO情报分析报告', r.created);
+      setTimeout(function() { if (dlBtn) dlBtn.textContent = origText; }, 3000);
+    };
+    document.head.appendChild(script);
+  } else {
+    doPdf();
+  }
+}
+
+function showPrintFallback(contentHtml, fileName, createdDate) {
   var w = window.open('', '_blank');
+  if (!w) { alert('PDF生成失败，请使用复制报告内容'); return; }
+  var inner = contentHtml ? contentHtml.replace(/<h1[^>]*>[\s\S]*?<\/h1>/, '') : '<p>报告内容生成失败</p>';
   var h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + fileName + '</title>';
   h += '<style>body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;padding:40px;color:#333;line-height:1.8}';
   h += '@page{size:A4;margin:2cm}';
@@ -1166,121 +1315,17 @@ function printAnalysis() {
   h += '.ft{text-align:center;color:#999;font-size:12px;margin-top:40px;border-top:1px solid #eee;padding-top:12px}';
   h += '@media print{body{padding:20px}}</style></head><body>';
   h += '<h1>GEO情报分析报告</h1>';
-  h += '<table><tr><td class="l">甲方/采购方</td><td>' + (r.client||'待确认') + '</td></tr>';
-  h += '<tr><td class="l">项目名称</td><td>' + (r.title||'待确认') + '</td></tr>';
-  h += '<tr><td class="l">预算金额</td><td>' + (r.budget||'未公开') + '</td></tr>';
-  h += '<tr><td class="l">所属行业</td><td>' + (r.industry||'待确认') + '</td></tr>';
-  if (r.deadline) h += '<tr><td class="l">截止日期</td><td>' + r.deadline + '</td></tr>';
-  if (r.winner) h += '<tr><td class="l">中标方</td><td><strong>' + r.winner + '</strong></td></tr>';
-  if (r.biddingId) h += '<tr><td class="l">招标编号</td><td>' + r.biddingId + '</td></tr>';
-  if (r.servicePeriod) h += '<tr><td class="l">服务期限</td><td>' + r.servicePeriod + '</td></tr></table>';
-  if (r.signals && r.signals.length > 0) {
-    h += '<h2>趋势信号</h2><p>';
-    for (var i = 0; i < r.signals.length; i++) h += '<span class="sig">' + r.signals[i] + '</span> ';
-    h += '</p>';
-  }
-  h += '<h2>市场分析</h2><div class="intel">' + (r.intelligence || '暂无自动分析数据') + '</div>';
-  if (r.notes && r.notes !== '可在此补充你的分析洞察或根据最新信息修正上述分析...') {
-    h += '<h2>情报解读</h2><div class="intel" style="background:#fff">' + r.notes.replace(/\n/g,'<br>') + '</div>';
-  }
-  h += '<div class="ft">生成日期：' + (r.created||'') + ' | 来源：GEO招投标情报站</div>';
-  h += '<script>window.onload=function(){window.print()}<\/script></body></html>';
+  h += inner;
+  if (createdDate) h += '<div class="ft">生成日期：' + createdDate + ' | 来源：GEO招投标情报站</div>';
+  h += '<script>setTimeout(function(){window.print()},500)<\/script></body></html>';
   w.document.write(h);
   w.document.close();
 }
 
-function downloadPdf() {
-  if (!window._lastAnalysis) return;
-  // Capture DOM edits fresh (don't rely on getResultFields)
-  var r = JSON.parse(JSON.stringify(window._lastAnalysis));
-  var editableCells = document.querySelectorAll('.report-table .rv.editable');
-  if (editableCells.length >= 1) r.client = editableCells[0].textContent.trim() || r.client;
-  if (editableCells.length >= 2) r.title = editableCells[1].textContent.trim() || r.title;
-  if (editableCells.length >= 3) r.budget = editableCells[2].textContent.trim() || r.budget;
-  var nf = document.getElementById('analysisNotes');
-  r.notes = nf ? nf.textContent.trim() : '';
-
-  var client = r.client || 'GEO';
-
-  // Generate sections in main page (has access to data)
-  var similar = matchExistingProjects(r.raw || '', r.client, r.industry);
-  var freshIntel = generateIntelligence(r);
-
-  // Build ALL section HTML strings
-  var fields = [
-    ['甲方/采购方', r.client||'待确认'],
-    ['项目名称', r.title||'待确认'],
-    ['预算金额', r.budget||'未公开'],
-    ['所属行业', r.industry||'待确认']
-  ];
-  if (r.deadline) fields.push(['截止日期', r.deadline]);
-  if (r.winner) fields.push(['中标方', r.winner]);
-  if (r.biddingId) fields.push(['招标编号', r.biddingId]);
-  if (r.servicePeriod) fields.push(['服务期限', r.servicePeriod]);
-  var infoHtml = '';
-  for (var fi = 0; fi < fields.length; fi++) {
-    infoHtml += '<tr><td class="l">' + fields[fi][0] + '</td><td>' + fields[fi][1] + '</td></tr>';
-  }
-
-  var sigHtml = '';
-  if (r.signals && r.signals.length > 0) {
-    sigHtml = '<h2>趋势信号</h2><p>';
-    for (var si = 0; si < r.signals.length; si++) sigHtml += '<span class="sig">' + r.signals[si] + '</span> ';
-    sigHtml += '</p>';
-  }
-
-  var benchHtml = '';
-  if (similar.length > 0) {
-    benchHtml += '<h2>行业对标</h2><table><tr><td class="lh" style="font-size:13px;color:#555">甲方</td><td class="lh" style="font-size:13px;color:#555">金额</td><td class="lh" style="font-size:13px;color:#555">状态</td><td class="lh" style="font-size:13px;color:#555">中标方</td></tr>';
-    for (var bi = 0; bi < similar.length; bi++) {
-      var sp = similar[bi].project;
-      benchHtml += '<tr><td style="font-size:13px;padding:6px 10px">' + sp.company + '</td><td style="font-size:13px;padding:6px 10px">' + (sp.budget && sp.budget !== '未公开' ? sp.budget : '—') + '</td><td style="font-size:13px;padding:6px 10px">' + sp.status + '</td><td style="font-size:13px;padding:6px 10px">' + (sp.winner || '—') + '</td></tr>';
-    }
-    benchHtml += '</table>';
-  }
-
-  var notesHtml = '';
-  if (r.notes && r.notes !== '可在此补充你的分析洞察或根据最新信息修正上述分析...') {
-    notesHtml = '<h2>情报解读</h2><div class="intel" style="background:#fff">' + r.notes.replace(/\n/g,'<br>') + '</div>';
-  }
-
-  // Open preview window
-  var w = window.open('', '_blank');
-  if (!w) { alert('请允许弹出窗口以预览报告'); return; }
-
-  var h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + client + '_GEO情报分析报告</title>';
-  h += '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script><style>';
-  h += '*{margin:0;padding:0;box-sizing:border-box}';
-  h += 'body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;padding:30px;max-width:800px;margin:0 auto;color:#333;line-height:1.8;background:#f5f7fa}';
-  h += '.pc{background:#fff;border-radius:12px;padding:40px;box-shadow:0 2px 12px rgba(0,0,0,.08)}';
-  h += 'h1{font-size:24px;text-align:center;border-bottom:2px solid #302b63;padding-bottom:12px;margin-bottom:20px;color:#1a1a2e}';
-  h += 'h2{font-size:17px;color:#302b63;margin:24px 0 10px;padding-left:10px;border-left:3px solid #302b63}';
-  h += 'table{width:100%;border-collapse:collapse;margin:12px 0}';
-  h += 'td{padding:7px 10px;border:1px solid #e0e0e0;font-size:14px}';
-  h += 'td.l{background:#f5f5f5;font-weight:600;width:110px;color:#555}';
-  h += 'td.lh{background:#f5f5f5;font-weight:600;padding:6px 10px;border:1px solid #e0e0e0}';
-  h += '.sig{display:inline-block;padding:3px 10px;border-radius:10px;font-size:12px;margin:2px;background:#e3f2fd;color:#2980b9;border:1px solid #bbdefb}';
-  h += '.intel{padding:12px 16px;background:#fafafa;border-radius:6px;font-size:13px;line-height:1.9;white-space:pre-wrap;border:1px solid #eee}';
-  h += '.ft{text-align:center;color:#999;font-size:12px;margin-top:40px;border-top:1px solid #eee;padding-top:12px}';
-  h += '.tb{text-align:center;margin:20px 0 40px;position:sticky;top:10px;z-index:10}';
-  h += '.bd{display:inline-block;padding:14px 40px;font-size:18px;background:linear-gradient(135deg,#302b63,#24243e);color:#fff;border:none;border-radius:10px;cursor:pointer;box-shadow:0 4px 15px rgba(48,43,99,.3)}';
-  h += '.bd:disabled{opacity:.7;cursor:default}';
-  h += '.nt{font-size:12px;color:#999;margin-top:8px}';
-  h += '@media print{.tb{display:none}}';
-  h += '</style></head><body>';
-  h += '<div class="tb"><button class="bd" id="dlBtn" onclick="doDownload()">📥 下载PDF</button><div class="nt">点击下载后PDF将自动保存到您的设备</div></div>';
-  h += '<div class="pc" id="rc">';
-  h += '<h1>GEO情报分析报告</h1>';
-  h += '<table>' + infoHtml + '</table>';
-  h += sigHtml + benchHtml;
-  h += '<h2>市场分析</h2><div class="intel">' + freshIntel + '</div>';
-  h += notesHtml;
-  h += '<div class="ft">生成日期：' + (r.created||'') + ' | 来源：GEO招投标情报站</div>';
-  h += '</div>';
-  h += '<script>function doDownload(){var b=document.getElementById(\"dlBtn\");if(b.disabled)return;b.disabled=true;b.textContent=\"⏳ 生成PDF中...\";var e=document.getElementById(\"rc\");if(typeof html2pdf===\"undefined\"){b.textContent=\"❌ 库加载失败，请重试\";b.disabled=false;return;}html2pdf().set({margin:[15,15],filename:\"' + client + '_GEO情报分析报告.pdf\",image:{type:\"jpeg\",quality:0.95},html2canvas:{scale:2,useCORS:true,logging:false},jsPDF:{unit:\"mm\",format:\"a4\",orientation:\"portrait\"}}).from(e).save().then(function(){b.textContent=\"✅ 下载完成\";setTimeout(function(){b.textContent=\"📥 再次下载\";b.disabled=false},2000)}).catch(function(){b.textContent=\"❌ 生成失败，请重试\";b.disabled=false})}<\/script>';
-  h += '</body></html>';
-  w.document.write(h);
-  w.document.close();
+function printAnalysis() {
+  // Ensure analysis tab is active so report is visible
+  switchTab('analysis');
+  setTimeout(function() { window.print(); }, 400);
 }
 
 function restoreAnalysis(id) {
@@ -1332,8 +1377,74 @@ function render() {
 }
 
 startApp();
-
 </script>
+
+<div class="detail-page" id="detailPage">
+  <div class="detail-header">
+    <button class="detail-back" onclick="closeDetail()">← 返回</button>
+    <span class="detail-header-title" id="detailHeaderTitle">项目详情</span>
+  </div>
+  <div class="detail-body" id="detailBody"></div>
+</div>
+
+<script>
+function showProject(pid) {
+  var p = null;
+  for (var i = 0; i < data.projects.length; i++) {
+    if (data.projects[i].id === pid) { p = data.projects[i]; break; }
+  }
+  if (!p) return;
+  var c = p._computed;
+  document.getElementById('detailHeaderTitle').textContent = p.company + ' - 项目详情';
+  var html = '<div class="detail-company">' + p.company + ' ' + statusTag(p.status) + '</div>';
+  html += '<div style="margin-bottom:4px"><span class="industry-tag">' + p.industry + '</span></div>';
+  html += '<div class="detail-meta">';
+  if (p.budget && p.budget != '未公开') html += '<span>💰 ' + p.budget + '</span>';
+  if (p.publish_date) html += '<span>📅 发布 ' + p.publish_date + '</span>';
+  if (p.bid_deadline) html += '<span>⏰ 截止 ' + p.bid_deadline + '</span>';
+  html += '</div>';
+  html += '<div class="detail-section"><div class="detail-section-title">项目名称</div><div style="font-size:15px;font-weight:600;color:#333">' + p.title + '</div></div>';
+  html += '<div class="detail-section"><div class="detail-section-title">项目详情</div><div class="detail-summary">' + p.summary + '</div></div>';
+  if (c.signals && c.signals.length) {
+    html += '<div class="detail-section"><div class="detail-section-title">趋势信号</div><div class="detail-signals">';
+    for (var si = 0; si < c.signals.length; si++) html += '<span class="signal-tag">' + c.signals[si] + '</span>';
+    html += '</div></div>';
+  }
+  if (p.winner) html += '<div class="detail-winner">🏆 中标方：' + p.winner + '</div>';
+  html += '<div class="detail-link">';
+  if (p.source_url) {
+    html += '<a href="' + p.source_url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 查看原文公告 <span style="font-size:12px;opacity:.7">' + extractSourceName(p.source_url) + '</span></a>';
+  } else {
+    html += '<span style="color:#999;font-size:13px">暂无原文链接</span>';
+  }
+  html += '</div>';
+  // Related projects (same industry)
+  var related = [];
+  for (var i = 0; i < data.projects.length; i++) {
+    if (data.projects[i].id !== p.id && data.projects[i].industry === p.industry) related.push(data.projects[i]);
+  }
+  if (related.length > 0) {
+    html += '<div class="detail-section"><div class="detail-section-title">同行业其他项目</div>';
+    for (var ri = 0; ri < Math.min(related.length, 4); ri++) {
+      var rp = related[ri];
+      html += '<div class="detail-project-card" onclick=\'showProject("' + rp.id + '")\'><div class="pc-company">' + rp.company + ' ' + statusTag(rp.status) + '</div><div class="pc-meta"><span>' + rp.title.substring(0, 40) + (rp.title.length > 40 ? '...' : '') + '</span><span>' + (rp.budget && rp.budget != '未公开' ? rp.budget : '') + '</span></div></div>';
+    }
+    html += '</div>';
+  }
+  document.getElementById('detailBody').innerHTML = html;
+  document.getElementById('detailPage').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  window.scrollTo(0, 0);
+}
+
+function closeDetail() {
+  document.getElementById('detailPage').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeDetail();
+});
 
 </body>
 </html>

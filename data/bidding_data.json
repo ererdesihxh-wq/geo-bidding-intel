@@ -198,7 +198,7 @@
       "company": "和君职业学院",
       "industry": "教育",
       "title": "生成式AI搜索引擎GEO优化服务项目",
-      "status": "已成交",
+      "status": "已中标",
       "budget": "8万元",
       "bid_deadline": "2026-05-20",
       "publish_date": "2026-05-15",
@@ -326,14 +326,14 @@
       "industry": "汽车/出行",
       "title": "东风Honda 2026年GEO项目（生成式引擎优化）",
       "status": "已中标",
-      "budget": "1207万元",
+      "budget": "约120.7万元",
       "bid_deadline": "2025-03-16",
       "publish_date": "2025-02-13",
-      "summary": "东风本田2026年GEO项目，在DeepSeek、Kimi、元宝、豆包、文心一言、通义千问等6个AI平台中针对预设问题持续推荐指定车型。要求维持至少1年推荐效果。中标方为新智科技发展有限公司，中标金额约1207万元。",
+      "summary": "东风本田2026年GEO项目，在DeepSeek、Kimi、元宝、豆包、文心一言、通义千问等6个AI平台中针对预设问题持续推荐指定车型。要求维持至少1年推荐效果。中标方为新智科技发展有限公司，中标金额约120.7万元（1,207,128元）。",
       "winner": "新智科技发展有限公司",
-      "source_url": "https://www.bidchance.com/info-zhongbiao-95693f7b5995c646dd4ce3fffed20dbc.html",
+      "source_url": "https://hub.zhiliaobiaoxun.com/article/94001908",
       "_computed": {
-        "budget_wan": 1207.0,
+        "budget_wan": 120.7,
         "signals": [
           "💰 高预算(≥100万)"
         ]
@@ -583,10 +583,9 @@
   ],
   "status_summary": {
     "已截止": 14,
-    "已中标": 9,
+    "已中标": 10,
     "招标中": 5,
-    "已开标": 2,
-    "已成交": 1
+    "已开标": 2
   },
   "industry_distribution": {
     "汽车/出行": 3,
